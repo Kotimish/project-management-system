@@ -1,0 +1,7 @@
+services:
+  monolith:
+    build:
+      context: ./apps/monolith
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
