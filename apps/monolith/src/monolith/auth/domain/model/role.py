@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from monolith.auth.domain.exceptions import role_exception as exceptions
 from monolith.auth.domain.model.mixins import IdMixin, TimestampMixin
 
 
@@ -26,11 +27,10 @@ class Role(IdMixin, TimestampMixin):
         self._validate()
 
     def _validate(self):
-        # TODO прописать кастомные исключения
         if not self.name:
-            raise ValueError("Role name is required")
+            raise exceptions.InvalidRoleNameException("Role name is required")
         if not self.slug:
-            raise ValueError("Role slug is required")
+            raise exceptions.InvalidRoleSlugException("Role slug is required")
 
     def update_description(self, description: str):
         self.description = description

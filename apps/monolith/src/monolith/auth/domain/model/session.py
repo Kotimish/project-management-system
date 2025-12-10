@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
-from monolith.auth.domain.model.mixins import IdMixin, TimestampMixin, ExpirableMixin
+from monolith.auth.domain.model.mixins import IdMixin, TimestampMixin, ExpirableMixin, RevokedAtMixin
 
 
-class Session(IdMixin, TimestampMixin, ExpirableMixin):
+class Session(IdMixin, TimestampMixin, ExpirableMixin, RevokedAtMixin):
     """Класс модели-сущности сессии пользователя"""
 
     def __init__(
@@ -19,10 +19,10 @@ class Session(IdMixin, TimestampMixin, ExpirableMixin):
         IdMixin.__init__(self, session_id)
         TimestampMixin.__init__(self, created_at, updated_at)
         ExpirableMixin.__init__(self, expires_at)
+        RevokedAtMixin.__init__(self, revoked_at)
         # Обязательные атрибуты
         self.id = session_id
         self.user_id = user_id
-        self.revoked_at = revoked_at
 
     @property
     def is_active(self) -> bool:
