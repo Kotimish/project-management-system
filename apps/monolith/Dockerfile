@@ -20,9 +20,12 @@ RUN poetry install --no-root
 # Копируем код
 COPY src/monolith ./src/monolith
 
+# Копирует файл окружения
+COPY .env.default .env
+
 # Устанавливаем модули
 RUN poetry install
 
 EXPOSE 8000
 
-CMD ["poetry", "run", "uvicorn", "monolith.presentation.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["poetry", "run", "uvicorn", "monolith.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
