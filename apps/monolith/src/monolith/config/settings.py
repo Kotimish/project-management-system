@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from monolith.config.auth_config import AuthConfig
+from monolith.config.db_config import DbConfig
 
 # monolith/src/monolith/config/settings.py
 # monolith/ — корень проекта, содержит .env и .env.default
@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     )
 
     auth: AuthConfig
+    db: DbConfig
 
 
 settings = Settings()
