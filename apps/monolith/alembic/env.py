@@ -37,6 +37,15 @@ config.set_main_option(
     ),
 )
 
+def include_object(obj, name, type_, reflected, compare_to):
+    """
+    Проверка для схем при миграции
+    """
+    if type_ == "table":
+        if hasattr(obj, 'schema') and obj.schema:
+            return True
+    return True
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -66,7 +75,8 @@ def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=all_target_metadata,
-        # include_schemas=True,
+        include_schemas=True,
+        include_object=include_object
     )
 
     with context.begin_transaction():
