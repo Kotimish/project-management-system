@@ -1,7 +1,38 @@
 services:
+  pg:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+
   monolith:
     build:
       context: ./apps/monolith
       dockerfile: Dockerfile
+    environment:
+      MONOLITH__DB__DATABASE: ${DB_DATABASE}
+      MONOLITH__DB__HOST: pg
+      MONOLITH__DB__USERNAME: ${DB_USERNAME}
+      MONOLITH__DB__PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./keys/private.pem:/app/keys/private.pem:ro
+      - ./keys/public.pem:/app/keys/public.pem:ro
     ports:
       - "8000:8000"
+    depends_on:
+      pg:
+        condition: service_healthy
+
+volumes:
+  pg_data:
