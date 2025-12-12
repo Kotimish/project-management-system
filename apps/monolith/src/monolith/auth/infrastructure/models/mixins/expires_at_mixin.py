@@ -6,5 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 class ExpiresAtMixin:
     expires_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(),
+        default=None,
+        server_default=None,
+        nullable=True,
     )
