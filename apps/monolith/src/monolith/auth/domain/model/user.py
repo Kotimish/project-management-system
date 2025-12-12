@@ -46,5 +46,5 @@ class User(IdMixin, TimestampMixin, RevokedAtMixin):
         return self.revoked_at is None
 
     def deactivate(self):
-        self.revoked_at = datetime.now(timezone.utc)
+        self.revoked_at = datetime.now()
         self.touch()

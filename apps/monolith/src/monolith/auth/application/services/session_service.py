@@ -22,7 +22,7 @@ class SessionService(ISessionService):
         self.config = config
 
     async def create_session(self, user: User) -> Session:
-        expire_at = datetime.now(timezone.utc) + timedelta(minutes=self.config.refresh_token_expire_minutes)
+        expire_at = datetime.now() + timedelta(minutes=self.config.refresh_token_expire_minutes)
         session = self.factory.create(user, expire_at)
         session = await self.repository.add(session)
         return session
@@ -34,7 +34,8 @@ class SessionService(ISessionService):
         session = await self.get_session_by_id(session_id)
         if not session:
             return False
-        session.revoked_at = datetime.now(timezone.utc)
+        session.revoked_at = datetime.now()
+        await self.repository.update(session.id, session)
         return True
 
     async def delete_session(self, session_id: int) -> bool:

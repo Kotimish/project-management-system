@@ -27,6 +27,7 @@ class Session(IdMixin, TimestampMixin, ExpirableMixin, RevokedAtMixin):
     @property
     def is_active(self) -> bool:
         return (
-            self.expires_at > datetime.now(timezone.utc) and
+            self.expires_at is not None and
+            self.expires_at > datetime.now() and
             self.revoked_at is None
         )

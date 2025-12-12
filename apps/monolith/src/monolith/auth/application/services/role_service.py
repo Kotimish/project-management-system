@@ -12,7 +12,7 @@ class RoleService(IRoleService):
         return await self.repository.get_by_id(role_id)
 
     async def get_default_role_id(self) -> int:
-        role = await self.repository.get_by_slug(slug='default')
+        role = await self.repository.get_by_slug(slug='user')
         if not role:
             raise exceptions.InvalidRoleException("Default role not found")
         return role.id

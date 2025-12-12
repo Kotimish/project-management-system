@@ -14,7 +14,7 @@ class TokenService(ITokenService):
         self.config = config
 
     def create_access_token(self, user: User, role: Role) -> str:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=self.config.access_token_expire_minutes)
+        expire = datetime.now() + timedelta(minutes=self.config.access_token_expire_minutes)
         data = {
             "sub": str(user.id),
             "role_slug": role.slug,
@@ -23,7 +23,7 @@ class TokenService(ITokenService):
         return self.jwt_service.encode(data)
 
     def create_refresh_token(self, user: User, role: Role, session: Session) -> str:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=self.config.refresh_token_expire_minutes)
+        expire = datetime.now() + timedelta(minutes=self.config.refresh_token_expire_minutes)
         data = {
             "sub": str(user.id),
             "role_slug": role.slug,

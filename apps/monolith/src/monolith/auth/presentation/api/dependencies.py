@@ -1,4 +1,6 @@
-from fastapi import Request
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing_extensions import AsyncGenerator
 
 from monolith.auth.application.interfaces.security.hash_service import IHashService
 from monolith.auth.application.interfaces.security.jwt_service import IJWTService
@@ -12,18 +14,71 @@ from monolith.auth.application.services.role_service import RoleService
 from monolith.auth.application.services.session_service import SessionService
 from monolith.auth.application.services.token_service import TokenService
 from monolith.auth.application.services.user_service import UserService
+from monolith.auth.domain.interfaces.repositories.role_repository import IRoleRepository
+from monolith.auth.domain.interfaces.repositories.session_repository import ISessionRepository
+from monolith.auth.domain.interfaces.repositories.user_repository import IUserRepository
 from monolith.auth.infrastructure.factories.session_factory import SessionFactory
 from monolith.auth.infrastructure.factories.user_factory import UserFactory
+from monolith.auth.infrastructure.repositories.role import ORMRoleRepository
+from monolith.auth.infrastructure.repositories.session import ORMSessionRepository
+from monolith.auth.infrastructure.repositories.user import ORMUserRepository
 from monolith.auth.infrastructure.security.bcrypt_hash_service import BcryptHashService
 from monolith.auth.infrastructure.security.key_loader import load_key
 from monolith.auth.infrastructure.security.py_jwt_service import PyJWTService
 from monolith.config.settings import settings
+from monolith.infrastructure.database import async_session
 
 
-def get_auth_service(request: Request) -> IAuthenticationService:
-    user_service = get_user_service(request)
-    role_service = get_role_service(request)
-    session_service = get_session_service(request)
+async def get_async_session() -> AsyncGenerator[AsyncSession]:
+    async with async_session() as session:
+        yield session
+
+
+async def get_role_repository(
+        session: AsyncSession = Depends(get_async_session)
+) -> IRoleRepository:
+    return ORMRoleRepository(session)
+
+
+async def get_users_repository(
+        session: AsyncSession = Depends(get_async_session)
+) -> IUserRepository:
+    return ORMUserRepository(session)
+
+
+async def get_session_repository(
+        session: AsyncSession = Depends(get_async_session)
+) -> ISessionRepository:
+    return ORMSessionRepository(session)
+
+
+def get_role_service(
+        repository=Depends(get_role_repository)
+) -> IRoleService:
+    return RoleService(repository)
+
+
+def get_user_service(
+        repository=Depends(get_users_repository),
+        role_service=Depends(get_role_service),
+) -> IUserService:
+    factory = UserFactory()
+    hash_service = get_hash_service()
+    return UserService(factory, repository, role_service, hash_service)
+
+
+def get_session_service(
+        repository=Depends(get_session_repository)
+) -> ISessionService:
+    factory = SessionFactory()
+    return SessionService(factory, repository, settings.auth)
+
+
+def get_auth_service(
+        user_service=Depends(get_user_service),
+        role_service=Depends(get_role_service),
+        session_service=Depends(get_session_service),
+) -> IAuthenticationService:
     token_service = get_token_service()
     hash_service = get_hash_service()
     return AuthenticationService(
@@ -33,25 +88,6 @@ def get_auth_service(request: Request) -> IAuthenticationService:
         token_service,
         hash_service
     )
-
-
-def get_user_service(request: Request) -> IUserService:
-    factory = UserFactory()
-    repository = request.app.state.user_repository
-    role_service = get_role_service(request)
-    hash_service = get_hash_service()
-    return UserService(factory, repository, role_service, hash_service)
-
-
-def get_role_service(request: Request) -> IRoleService:
-    repository = request.app.state.role_repository
-    return RoleService(repository)
-
-
-def get_session_service(request: Request) -> ISessionService:
-    factory = SessionFactory()
-    repository = request.app.state.session_repository
-    return SessionService(factory, repository,  settings.auth)
 
 
 def get_token_service() -> ITokenService:
