@@ -7,7 +7,7 @@ from monolith.auth.infrastructure.models import Base
 from monolith.auth.infrastructure.models.mixins import IdIntPkMixin, TimestampMixin, RevokedAtMixin
 
 if TYPE_CHECKING:
-    from monolith.auth.infrastructure.models import Role
+    from monolith.auth.infrastructure.models import Role, Session
 
 
 class User(IdIntPkMixin, TimestampMixin, RevokedAtMixin, Base):
@@ -31,4 +31,7 @@ class User(IdIntPkMixin, TimestampMixin, RevokedAtMixin, Base):
     )
     role: Mapped["Role"] = relationship(
         back_populates="users",
+    )
+    sessions: Mapped["Session"] = relationship(
+        back_populates="user",
     )
