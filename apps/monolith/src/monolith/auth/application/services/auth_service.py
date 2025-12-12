@@ -66,7 +66,9 @@ class AuthenticationService(IAuthenticationService):
         # Получение и проверки пользователя
         user = await self.user_service.get_user_by_id(data.sub)
         if not user:
-            raise exceptions.InvalidLoginException("Login not found")
+            raise exceptions.NotFoundUserException("User not found")
+        if not user.is_active:
+            raise exceptions.InactiveUserException("Inactive user")
         # Получение роли для генерации токенов
         role = await self.role_service.get_role_by_id(user.role_id)
         return self.token_service.create_access_token(user, role)

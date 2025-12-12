@@ -1,5 +1,6 @@
 from datetime import timezone, datetime, timedelta
 
+from monolith.auth.application.exceptions import auth_exceptions as exceptions
 from monolith.auth.application.interfaces.factories.session_factory import ISessionFactory
 from monolith.auth.application.interfaces.services.session_service import ISessionService
 from monolith.auth.domain.interfaces.repositories.session_repository import ISessionRepository
@@ -33,7 +34,7 @@ class SessionService(ISessionService):
     async def revoke_session(self, session_id: int) -> bool:
         session = await self.get_session_by_id(session_id)
         if not session:
-            return False
+            raise exceptions.InvalidSessionException("Session invalid or already revoked")
         session.revoked_at = datetime.now()
         await self.repository.update(session.id, session)
         return True

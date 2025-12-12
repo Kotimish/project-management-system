@@ -13,6 +13,9 @@ class InvalidLoginException(AuthException):
     """Исключение для неверно веденного логина (отсутствует в системе)"""
 
 
+class NotFoundUserException(AuthException):
+    """Исключение попытки найти несуществующего пользователя по id"""
+
 class InactiveUserException(AuthException):
     """Исключение для деактивированного пользователя"""
 

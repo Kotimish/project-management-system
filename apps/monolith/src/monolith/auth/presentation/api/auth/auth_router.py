@@ -1,9 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
 from monolith.auth.application.dtos.user import CreateUserCommand, LoginUserCommand
+from monolith.auth.application.exceptions import auth_exceptions as exceptions
 from monolith.auth.application.interfaces.services.auth_service import IAuthenticationService
 from monolith.auth.application.interfaces.services.token_service import ITokenService
 from monolith.auth.application.interfaces.services.user_service import IUserService
@@ -32,7 +33,12 @@ async def register(
         email=request.email,
         password=request.password
     )
-    response = await service.create_user(user)
+    try:
+        response = await service.create_user(user)
+    except exceptions.InvalidRoleException:
+        raise HTTPException(status_code=500, detail="Default role not found")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
     return RegistrateUserResponse(id=response.id)
 
 
@@ -46,7 +52,16 @@ async def login(
         login=request.login,
         password=request.password
     )
-    response = await service.login_user(session)
+    try:
+        response = await service.login_user(session)
+    except exceptions.InvalidLoginException:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    except exceptions.InvalidPasswordException:
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    except exceptions.InactiveUserException:
+        raise HTTPException(status_code=403, detail="User account is inactive")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
     return LoginResponse(
         access_token=response.access_token,
         refresh_token=response.refresh_token
@@ -59,8 +74,13 @@ async def logout(
         service: IAuthenticationService = Depends(get_auth_service)
 ):
     """Выход пользователя, отзыв токенов, удаление сессии."""
-    await service.logout_user(refresh_token)
-    return LogoutResponseScheme(msg="Succesfully logout")
+    try:
+        await service.logout_user(refresh_token)
+    except exceptions.InvalidSessionException:
+        raise HTTPException(status_code=401, detail="Session invalid or already revoked")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    return LogoutResponseScheme(msg="Successfully logout")
 
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -69,7 +89,18 @@ async def refresh(
         service: IAuthenticationService = Depends(get_auth_service)
 ):
     """Обновление короткоживущего токена (access_token) с использованием долгоживущего токена (refresh_token)."""
-    access_token = await service.refresh_access_token(refresh_token)
+    try:
+        access_token = await service.refresh_access_token(refresh_token)
+    except exceptions.InvalidSessionException:
+        raise HTTPException(status_code=401, detail="Session not found")
+    except exceptions.InactiveSessionException:
+        raise HTTPException(status_code=401, detail="Inactive session")
+    except exceptions.NotFoundUserException:
+        raise HTTPException(status_code=500, detail="User not found")
+    except exceptions.InactiveUserException:
+        raise HTTPException(status_code=401, detail="Inactive user")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
     return TokenResponse(token=access_token)
 
 
