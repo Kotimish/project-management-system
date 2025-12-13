@@ -1,7 +1,5 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlalchemy.testing.suite.test_reflection import users
 
 from monolith.auth.domain.interfaces.repositories.user_repository import IUserRepository
 from monolith.auth.infrastructure.models import User as ORMUser

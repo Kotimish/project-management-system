@@ -1,6 +1,5 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from monolith.auth.domain.interfaces.repositories.role_repository import IRoleRepository
 from monolith.auth.infrastructure.models import Role as ORMRole
