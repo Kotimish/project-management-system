@@ -1,3 +1,4 @@
+from enum import Enum
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -9,6 +10,10 @@ from monolith.config.db_config import DbConfig
 # monolith/ — корень проекта, содержит .env и .env.default
 BASE_DIR = Path(__file__).resolve().parents[3]
 
+class Environment(str, Enum):
+    DEVELOPMENT = "development"
+    PRODUCTION = "production"
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="MONOLITH__",
@@ -18,7 +23,7 @@ class Settings(BaseSettings):
             BASE_DIR / ".env",
         ),
     )
-
+    env: Environment = Environment.DEVELOPMENT
     auth: AuthConfig
     db: DbConfig
 
