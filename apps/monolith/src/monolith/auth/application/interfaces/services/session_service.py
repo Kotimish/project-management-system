@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from monolith.auth.domain.model.role import Role
 from monolith.auth.domain.model.session import Session
 from monolith.auth.domain.model.user import User
 
