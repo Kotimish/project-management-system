@@ -104,7 +104,7 @@ async def refresh(
     return TokenResponse(token=access_token)
 
 
-@router.post("/verify", response_model=DecodeTokenResponse)
+@router.get("/verify", response_model=DecodeTokenResponse)
 async def verify_token(
         access_token: Annotated[str, Depends(oauth2_scheme)],
         service: ITokenService = Depends(get_token_service)
