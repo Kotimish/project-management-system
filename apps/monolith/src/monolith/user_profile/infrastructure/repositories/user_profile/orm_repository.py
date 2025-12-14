@@ -40,6 +40,7 @@ class ORMUserProfileRepository(IUserProfileRepository):
         if not orm_profile:
             return None
         return UserProfile(
+            profile_id=orm_profile.id,
             auth_user_id=orm_profile.auth_user_id,
             display_name=orm_profile.display_name,
             first_name=orm_profile.first_name,
@@ -57,6 +58,7 @@ class ORMUserProfileRepository(IUserProfileRepository):
         if not orm_profile:
             return None
         return UserProfile(
+            profile_id=orm_profile.id,
             auth_user_id=orm_profile.auth_user_id,
             display_name=orm_profile.display_name,
             first_name=orm_profile.first_name,
@@ -73,6 +75,7 @@ class ORMUserProfileRepository(IUserProfileRepository):
         orm_profiles = result.all()
         return [
             UserProfile(
+                profile_id=orm_profile.id,
                 auth_user_id=orm_profile.auth_user_id,
                 display_name=orm_profile.display_name,
                 first_name=orm_profile.first_name,
@@ -101,6 +104,7 @@ class ORMUserProfileRepository(IUserProfileRepository):
         await self.session.commit()
         await self.session.refresh(orm_profile)
         return UserProfile(
+            profile_id=orm_profile.id,
             auth_user_id=orm_profile.auth_user_id,
             display_name=orm_profile.display_name,
             first_name=orm_profile.first_name,

@@ -11,7 +11,8 @@ from monolith.client.application.dtos.user import CreateUserCommand, LoginUserCo
 from monolith.client.application.interfaces.services.client_service import IClientService
 from monolith.client.presentation.api.dependencies import get_client_service, get_current_user
 from monolith.client.presentation.api.utils import render_message
-from monolith.client.presentation.schemas.register import RegistrateUserRequest
+from monolith.client.application.dtos import user_profile as dto
+from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.config.settings import BASE_DIR, settings, Environment
 
 router = APIRouter(
@@ -29,16 +30,17 @@ templates = Jinja2Templates(
 @router.get("/register", response_class=HTMLResponse, include_in_schema=False)
 async def get_register(
         request: Request,
-        current_user: dict = Depends(get_current_user)
+        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
 ):
     """Страница регистрации нового пользователя"""
     if current_user is not None:
+        schema = schemas.GetUserProfileResponse(**current_user.model_dump())
         return render_message(
             request,
             message="Вы уже авторизованы в системе.",
             back_url="/",
             button_text="Перейти на главную",
-            current_user=current_user,
+            current_user=schema.model_dump(),
         )
     context = {
         "request": request,
@@ -52,9 +54,9 @@ async def get_register(
 @router.post("/register", response_class=HTMLResponse, include_in_schema=False)
 async def post_register(
         request: Request,
-        login: str = Form(...),
-        email: str = Form(...),
-        password: str = Form(...),
+        login: Annotated[str, Form()],
+        email: Annotated[str, Form()],
+        password: Annotated[str, Form()],
         service: IClientService = Depends(get_client_service)
 ):
     """Регистрация нового пользователя"""
@@ -64,7 +66,7 @@ async def post_register(
         password=SecretStr(password)
     )
     try:
-        response = await service.register(user)
+        await service.register(user)
     except Exception as e:
         return render_message(
             request,
@@ -83,16 +85,17 @@ async def post_register(
 @router.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def get_login(
         request: Request,
-        current_user: dict = Depends(get_current_user)
+        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
 ):
     """Страница авторизации пользователя"""
     if current_user is not None:
+        schema = schemas.GetUserProfileResponse(**current_user.model_dump())
         return render_message(
             request,
             message="Вы уже авторизованы в системе.",
             back_url="/",
             button_text="Перейти на главную",
-            current_user=current_user
+            current_user=schema.model_dump()
         )
     context = {
         "request": request,
@@ -106,8 +109,8 @@ async def get_login(
 @router.post("/login", response_class=HTMLResponse, include_in_schema=False)
 async def post_login(
         request: Request,
-        login: str = Form(...),
-        password: str = Form(...),
+        login: Annotated[str, Form()],
+        password: Annotated[str, Form()],
         service: IClientService = Depends(get_client_service),
 ):
     """Авторизация пользователя"""

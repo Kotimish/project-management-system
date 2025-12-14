@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 
 from monolith.client.application.dtos import user
-from monolith.client.application.dtos.user_profile import GetUserProfileResponse
+from monolith.client.application.dtos.token import TokenDTO
 
 
-class IClientService(ABC):
-    """Интерфейс клиент сервиса"""
+class IAuthService(ABC):
+    """Интерфейс сервиса авторизации"""
+
     @abstractmethod
     async def register(self, data: user.CreateUserCommand) -> user.CreateUserResponse:
         """Регистрация пользователя"""
@@ -17,11 +18,14 @@ class IClientService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def logout(self, access_token: str) -> bool:
+    async def logout(self, refresh_token: str) -> bool:
         """Выход пользователя из системы"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_current_user(self, access_token: str) -> GetUserProfileResponse | None:
-        """Получить информацию о пользователе, отправившем запрос"""
+    async def validate_token(self, access_token: str) -> TokenDTO | None:
+        """
+        Отправляет запрос на сервис авторизации для декодирования и проверки актуальности
+        токена пользователя с возвратом данных
+        """
         raise NotImplementedError

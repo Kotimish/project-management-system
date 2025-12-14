@@ -9,6 +9,7 @@ class CreateUserCommand(BaseModel):
 
 class CreateUserResponse(BaseModel):
     id: int
+    login: str
 
 
 class LoginUserCommand(BaseModel):

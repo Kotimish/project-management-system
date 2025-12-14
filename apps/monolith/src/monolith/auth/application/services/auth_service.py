@@ -1,6 +1,6 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
-from monolith.auth.application.dtos.token import RefreshTokenDTO
+from monolith.auth.application.dtos.token import RefreshTokenDTO, AccessTokenDTO
 from monolith.auth.application.dtos.user import LoginUserCommand, LoginUserResponse
 from monolith.auth.application.exceptions import auth_exceptions as exceptions
 from monolith.auth.application.interfaces.security.hash_service import IHashService
@@ -72,3 +72,26 @@ class AuthenticationService(IAuthenticationService):
         # Получение роли для генерации токенов
         role = await self.role_service.get_role_by_id(user.role_id)
         return self.token_service.create_access_token(user, role)
+
+    async def validate_access(self, access_token: str) -> AccessTokenDTO:
+        pyload = self.token_service.decode_token(access_token)
+        data = AccessTokenDTO(**pyload)
+        exp_time = datetime.fromtimestamp(data.exp)
+        if exp_time <= datetime.now():
+            raise exceptions.ExpiredTokenException("Expired token")
+
+        user = await self.user_service.get_user_by_id(data.sub)
+        if not user:
+            raise exceptions.NotFoundUserException("User not found")
+        if not user.is_active:
+            raise exceptions.InactiveUserException("Inactive user")
+
+        token_role = await self.role_service.get_role_by_slug(data.role_slug)
+        current_role = await self.role_service.get_role_by_id(user.role_id)
+        if not token_role or not current_role:
+            raise exceptions.InvalidRoleException("Role not found")
+
+        if token_role.id != current_role.id:
+            raise exceptions.InvalidRoleException("Invalid user role")
+
+        return data
