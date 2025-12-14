@@ -2,8 +2,10 @@ __all__ = {
     "TaskStatus",
     "Project",
     "Participant",
+    "Sprint",
 }
 
 from monolith.project.domain.model.project import Project
 from monolith.project.domain.model.task_status import TaskStatus
 from monolith.project.domain.model.participant import Participant
+from monolith.project.domain.model.sprint import Sprint
