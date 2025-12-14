@@ -20,7 +20,7 @@
             {% if user %}
                 <!-- Ссылки для авторизированного пользователя -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile">{{user.sub}}</a>
+                    <a class="nav-link" href="/profile">Пользователь {{user.display_name}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Выйти</a>
