@@ -14,7 +14,7 @@ class Task(IdMixin, TimestampMixin):
             project_id: int,
             status_id: int,
             assignee_id: int | None,
-            sprint_id: int | None,
+            sprint_id: int | None = None,
             task_id: int | None = None,
             created_at: datetime | None = None,
             updated_at: datetime | None = None

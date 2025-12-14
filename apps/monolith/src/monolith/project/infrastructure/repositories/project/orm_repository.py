@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from monolith.project.domain.interfaces.repositories.project_repository import IProjectRepository
 from monolith.project.infrastructure.models import Project as ORMProject
+from monolith.project.infrastructure.models import Participant as ORMParticipant
 from monolith.project.domain.model import Project
 
 
@@ -48,6 +49,26 @@ class ProjectRepository(IProjectRepository):
             select(ORMProject)
             .where(ORMProject.owner_id==owner_id)
             .order_by(ORMProject.id)
+        )
+        result = await self.session.scalars(statement)
+        orm_projects = result.all()
+        return [
+            Project(
+                name=orm_project.name,
+                description=orm_project.description,
+                owner_id=orm_project.owner_id,
+                project_id=orm_project.id,
+                created_at=orm_project.created_at,
+                updated_at=orm_project.updated_at
+            )
+            for orm_project in orm_projects
+        ]
+
+    async def get_by_participant_id(self, user_id: int) -> list[Project]:
+        statement = (
+            select(ORMProject)
+            .join(ORMParticipant)
+            .where(ORMParticipant.auth_user_id == user_id)
         )
         result = await self.session.scalars(statement)
         orm_projects = result.all()

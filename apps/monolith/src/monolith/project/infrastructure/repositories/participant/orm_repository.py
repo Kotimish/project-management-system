@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from monolith.project.domain.interfaces.repositories.participant import IParticipantRepository
@@ -57,10 +57,41 @@ class ParticipantRepository(IParticipantRepository):
             for orm_participant in orm_participants
         ]
 
-    async def remove(self, participant_id: int) -> bool:
+    async def get_all_by_project_id(self, project_id) -> list[Participant]:
+        statement = (
+            select(ORMParticipant)
+            .where(ORMParticipant.project_id==project_id)
+            .order_by(ORMParticipant.id)
+        )
+        result = await self.session.scalars(statement)
+        orm_participants = result.all()
+        return [
+            Participant(
+                auth_user_id=orm_participant.auth_user_id,
+                project_id=orm_participant.project_id,
+                participant_id=orm_participant.id,
+                created_at=orm_participant.created_at,
+                updated_at=orm_participant.updated_at
+            )
+            for orm_participant in orm_participants
+        ]
+
+    async def remove_by_id(self, participant_id: int) -> bool:
         orm_participant = await self._get_by_id(participant_id)
         if not orm_participant:
             return False
         await self.session.delete(orm_participant)
+        await self.session.commit()
+        return True
+
+    async def remove_by_auth_user_and_project(self, auth_user_id: int, project_id: int) -> bool:
+        statement = (
+            delete(ORMParticipant).
+            where(
+                ORMParticipant.auth_user_id == auth_user_id,
+                ORMParticipant.project_id == project_id
+            )
+        )
+        result = await self.session.execute(statement)
         await self.session.commit()
         return True

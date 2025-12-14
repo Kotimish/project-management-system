@@ -69,6 +69,75 @@ class TaskRepository(ITaskRepository):
             for orm_task in orm_tasks
         ]
 
+    async def get_list_tasks_by_assignee(self, assignee_id: int) -> list[Task]:
+        statement = (
+            select(ORMTask)
+            .where(ORMTask.assignee_id==assignee_id)
+            .order_by(ORMTask.id)
+        )
+        result = await self.session.scalars(statement)
+        orm_tasks = result.all()
+        return [
+            Task(
+                task_id=orm_task.id,
+                title=orm_task.title,
+                description=orm_task.description,
+                project_id=orm_task.project_id,
+                status_id=orm_task.status_id,
+                assignee_id=orm_task.assignee_id,
+                sprint_id=orm_task.sprint_id,
+                created_at=orm_task.created_at,
+                updated_at=orm_task.updated_at,
+            )
+            for orm_task in orm_tasks
+        ]
+
+    async def get_list_tasks_by_project(self, project_id: int) -> list[Task]:
+        statement = (
+            select(ORMTask)
+            .where(ORMTask.project_id==project_id)
+            .order_by(ORMTask.id)
+        )
+        result = await self.session.scalars(statement)
+        orm_tasks = result.all()
+        return [
+            Task(
+                task_id=orm_task.id,
+                title=orm_task.title,
+                description=orm_task.description,
+                project_id=orm_task.project_id,
+                status_id=orm_task.status_id,
+                assignee_id=orm_task.assignee_id,
+                sprint_id=orm_task.sprint_id,
+                created_at=orm_task.created_at,
+                updated_at=orm_task.updated_at,
+            )
+            for orm_task in orm_tasks
+        ]
+
+    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[Task]:
+        statement = (
+            select(ORMTask)
+            .where(ORMTask.sprint_id==sprint_id)
+            .order_by(ORMTask.id)
+        )
+        result = await self.session.scalars(statement)
+        orm_tasks = result.all()
+        return [
+            Task(
+                task_id=orm_task.id,
+                title=orm_task.title,
+                description=orm_task.description,
+                project_id=orm_task.project_id,
+                status_id=orm_task.status_id,
+                assignee_id=orm_task.assignee_id,
+                sprint_id=orm_task.sprint_id,
+                created_at=orm_task.created_at,
+                updated_at=orm_task.updated_at,
+            )
+            for orm_task in orm_tasks
+        ]
+
     async def update(self, task_id: int, task: Task) -> Task | None:
         orm_task = await self._get_by_id(task_id)
         if not orm_task:

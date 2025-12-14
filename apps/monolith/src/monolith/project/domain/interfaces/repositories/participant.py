@@ -28,8 +28,22 @@ class IParticipantRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def remove(self, participant_id: int) -> bool:
+    async def get_all_by_project_id(self, project_id) -> list[Participant]:
+        """
+        Получает список всех участников проекта по id проекта.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def remove_by_id(self, participant_id: int) -> bool:
         """
         Удаляет участника проекта по ID.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def remove_by_auth_user_and_project(self, auth_user_id: int, project_id: int) -> bool:
+        """
+        Удаляет участника проекта по участнику и проекту.
         """
         raise NotImplementedError

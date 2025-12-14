@@ -23,7 +23,14 @@ class IProjectRepository(ABC):
     @abstractmethod
     async def get_by_owner_id(self, owner_id: int) -> list[Project]:
         """
-        Находит все Проекта по ID владельца.
+        Находит все Проекты по ID владельца.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_participant_id(self, user_id: int) -> list[Project]:
+        """
+        Находит все Проекты по ID участника.
         """
         raise NotImplementedError
 
