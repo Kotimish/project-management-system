@@ -1,8 +1,14 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String, Text, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from monolith.project.infrastructure.models import Base
 from monolith.project.infrastructure.models.mixins import IdIntPkMixin, TimestampMixin
+
+if TYPE_CHECKING:
+    from monolith.project.infrastructure.models import Participant
+
 
 
 class Project(IdIntPkMixin, TimestampMixin, Base):
@@ -21,6 +27,9 @@ class Project(IdIntPkMixin, TimestampMixin, Base):
     owner_id: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
+    )
+    participants: Mapped[list['Participant']] = relationship(
+        back_populates='project'
     )
 
     def __str__(self):
