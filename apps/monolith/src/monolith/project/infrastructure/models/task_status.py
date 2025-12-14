@@ -1,8 +1,13 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from monolith.project.infrastructure.models import Base
 from monolith.project.infrastructure.models.mixins import IdIntPkMixin, TimestampMixin
+
+if TYPE_CHECKING:
+    from monolith.project.infrastructure.models import Task
 
 
 class TaskStatus(IdIntPkMixin, TimestampMixin, Base):
@@ -23,6 +28,9 @@ class TaskStatus(IdIntPkMixin, TimestampMixin, Base):
         Text,
         default='',
         server_default='',
+    )
+    tasks: Mapped[list['Task']] = relationship(
+        back_populates='status'
     )
 
     def __str__(self):

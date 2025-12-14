@@ -7,7 +7,7 @@ from monolith.project.infrastructure.models import Base
 from monolith.project.infrastructure.models.mixins import IdIntPkMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from monolith.project.infrastructure.models import Participant, Sprint
+    from monolith.project.infrastructure.models import Participant, Sprint, Task
 
 
 
@@ -32,6 +32,9 @@ class Project(IdIntPkMixin, TimestampMixin, Base):
         back_populates='project'
     )
     sprints: Mapped[list['Sprint']] = relationship(
+        back_populates='project'
+    )
+    tasks: Mapped[list['Task']] = relationship(
         back_populates='project'
     )
 

@@ -8,7 +8,7 @@ from monolith.project.infrastructure.models import Base
 from monolith.project.infrastructure.models.mixins import IdIntPkMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from monolith.project.infrastructure.models import Project
+    from monolith.project.infrastructure.models import Project, Task
 
 
 class Sprint(IdIntPkMixin, TimestampMixin, Base):
@@ -33,6 +33,9 @@ class Sprint(IdIntPkMixin, TimestampMixin, Base):
     )
     project: Mapped['Project'] = relationship(
         back_populates='sprints'
+    )
+    tasks: Mapped[list['Task']] = relationship(
+        back_populates='sprint'
     )
 
     def __str__(self):
