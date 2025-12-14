@@ -82,6 +82,7 @@ async def update_profile(
         middle_name: Annotated[str | None, Form()] = None,
         last_name: Annotated[str | None, Form()] = None,
         description: Annotated[str | None, Form()] = None,
+        birthdate: Annotated[date | None, Form()] = None,
         phone: Annotated[str | None, Form()] = None,
         current_user: dto.GetUserProfileResponse = Depends(get_current_user),
         profile_service: IUserProfileService = Depends(get_user_profile_service)
@@ -100,7 +101,7 @@ async def update_profile(
         middle_name=middle_name,
         last_name=last_name,
         description=description,
-        birthdate=None,
+        birthdate=birthdate,
         phone=phone,
     )
     access_token = request.cookies.get("access_token")
