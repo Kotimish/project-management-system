@@ -17,7 +17,7 @@ class UserProfileService(IUserProfileService):
         try:
             response = await self.user_profile_client.post(
                 "/api/user_profile/",
-                json=data.model_dump()
+                json=data.model_dump(mode='json')
             )
             return dto.CreateUserProfileResponse.model_validate(response)
         except exceptions.HTTPStatusError:
@@ -54,7 +54,7 @@ class UserProfileService(IUserProfileService):
             response = await self.user_profile_client.patch(
                 f"/api/user_profile/{profile_id}",
                 headers=headers,
-                json=data.model_dump()
+                json=data.model_dump(mode='json')
             )
             return dto.UpdateUserProfileResponse.model_validate(response)
         except exceptions.HTTPStatusError:
