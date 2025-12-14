@@ -35,7 +35,7 @@ class IUserRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, role_id: int, role: User) -> User | None:
+    async def update(self, user_id: int, user: User) -> User | None:
         """
         Обновление данных пользователя
         """

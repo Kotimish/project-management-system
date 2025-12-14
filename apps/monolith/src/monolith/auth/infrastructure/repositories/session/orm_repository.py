@@ -1,6 +1,5 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from monolith.auth.domain.interfaces.repositories.session_repository import ISessionRepository
 from monolith.auth.infrastructure.models import Session as ORMSession

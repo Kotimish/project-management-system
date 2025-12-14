@@ -1,7 +1,7 @@
 import httpx
 
-from monolith.client.application.interfaces.client import IApiClient
 from monolith.client.application.exceptions import api_client_exception as exceptions
+from monolith.client.application.interfaces.client import IApiClient
 
 
 class HttpxApiClient(IApiClient):
@@ -35,6 +35,22 @@ class HttpxApiClient(IApiClient):
     async def post(self, endpoint: str, headers: dict = None, json: dict = None) -> dict:
         try:
             response = await self._client.post(endpoint, headers=headers, json=json)
+        except httpx.RequestError as e:
+            raise exceptions.RequestError(
+                message=str(e),
+            )
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            raise exceptions.HTTPStatusError(
+                status_code=response.status_code,
+                message=str(e),
+            )
+        return response.json()
+
+    async def patch(self, endpoint: str, headers: dict = None, json: dict = None) -> dict:
+        try:
+            response = await self._client.patch(endpoint, headers=headers, json=json)
         except httpx.RequestError as e:
             raise exceptions.RequestError(
                 message=str(e),

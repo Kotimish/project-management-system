@@ -23,8 +23,12 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 # Import base-models
 from monolith.auth.infrastructure import models as auth_models
+from monolith.user_profile.infrastructure import models as user_profile_models
 # all target metadata
-all_target_metadata = [auth_models.Base.metadata]
+all_target_metadata = [
+    auth_models.Base.metadata,
+    user_profile_models.Base.metadata
+]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

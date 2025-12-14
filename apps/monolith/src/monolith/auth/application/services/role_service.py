@@ -8,8 +8,11 @@ class RoleService(IRoleService):
     def __init__(self, repository: IRoleRepository):
         self.repository = repository
 
-    async def get_role_by_id(self, role_id) -> Role | None:
+    async def get_role_by_id(self, role_id: int) -> Role | None:
         return await self.repository.get_by_id(role_id)
+
+    async def get_role_by_slug(self, role_slug: str) -> Role | None:
+        return  await self.repository.get_by_slug(role_slug)
 
     async def get_default_role_id(self) -> int:
         role = await self.repository.get_by_slug(slug='user')

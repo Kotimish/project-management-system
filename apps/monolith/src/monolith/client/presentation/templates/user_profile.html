@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="text-center mb-0">Профиль пользователя</h2>
+                <a href="/profile/edit" class="btn btn-primary">Редактировать</a>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label"><strong>Отображаемое имя:</strong></label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            value="{{ user.display_name }}"
+                            readonly
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Имя:</strong></label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            value="{{ user.first_name if user.first_name else '' }}"
+                            readonly
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Отчество:</strong></label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            value="{{ user.middle_name if user.middle_name else '' }}"
+                            readonly
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Фамилия:</strong></label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            value="{{ user.last_name if user.last_name else '' }}"
+                            readonly
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Описание:</strong></label>
+                    <textarea
+                            class="form-control"
+                            rows="3"
+                            readonly>
+                        {{ user.description if user.description else '' }}
+                    </textarea>
+                </div>
+
+<!--                <div class="mb-3">-->
+<!--                    <label class="form-label"><strong>Дата рождения:</strong></label>-->
+<!--                    <input-->
+<!--                            type="date"-->
+<!--                            class="form-control"-->
+<!--                            value="{{ user.birthdate.strftime('%Y-%m-%d') if user.birthdate else '' }}"-->
+<!--                            readonly-->
+<!--                    >-->
+<!--                </div>-->
+
+                <div class="mb-3">
+                    <label class="form-label"><strong>Телефон:</strong></label>
+                    <input
+                            type="tel"
+                            class="form-control"
+                            value="{{ user.phone if user.phone else '' }}"
+                            readonly
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

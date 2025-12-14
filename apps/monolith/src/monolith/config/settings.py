@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from monolith.config.auth_config import AuthConfig
 from monolith.config.db_config import DbConfig
+from monolith.config.url_config import URLConfig
 
 # monolith/src/monolith/config/settings.py
 # monolith/ — корень проекта, содержит .env и .env.default
@@ -26,6 +27,7 @@ class Settings(BaseSettings):
     env: Environment = Environment.DEVELOPMENT
     auth: AuthConfig
     db: DbConfig
+    urls: URLConfig
 
 
 settings = Settings()

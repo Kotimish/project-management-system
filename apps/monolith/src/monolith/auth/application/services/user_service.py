@@ -27,7 +27,10 @@ class UserService(IUserService):
         default_role = await self.role_service.get_default_role_id()
         user = self.factory.create(data, hashed_password, default_role)
         user = await self.repository.add(user)
-        return CreateUserResponse(id=user.id)
+        return CreateUserResponse(
+            id=user.id,
+            login=user.login
+        )
 
     async def get_user_by_id(self, user_id: int) -> User | None:
         return await self.repository.get_by_id(user_id)

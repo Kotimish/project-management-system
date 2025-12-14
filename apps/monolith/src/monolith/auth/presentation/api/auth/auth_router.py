@@ -39,7 +39,10 @@ async def register(
         raise HTTPException(status_code=500, detail="Default role not found")
     except Exception:
         raise HTTPException(status_code=500, detail="Internal Server Error")
-    return RegistrateUserResponse(id=response.id)
+    return RegistrateUserResponse(
+        id=response.id,
+        login=response.login
+    )
 
 
 @router.post("/login")
@@ -112,3 +115,23 @@ async def verify_token(
     """Проверка короткоживущего токена (access_token) для других сервисов, возврат информации из токена."""
     payload = service.decode_token(access_token)
     return DecodeTokenResponse(**payload)
+
+
+@router.get("/validate", response_model=DecodeTokenResponse)
+async def validate_token(
+        access_token: Annotated[str, Depends(oauth2_scheme)],
+        service: IAuthenticationService = Depends(get_auth_service)
+):
+    try:
+        dto = await service.validate_access(access_token)
+    except exceptions.ExpiredTokenException:
+        raise HTTPException(status_code=401, detail="Expired token")
+    except exceptions.NotFoundUserException:
+        raise HTTPException(status_code=500, detail="User not found")
+    except exceptions.InactiveUserException:
+        raise HTTPException(status_code=401, detail="Inactive user")
+    except exceptions.InvalidRoleException:
+        raise HTTPException(status_code=401, detail="Invalid role")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    return DecodeTokenResponse(**dto.model_dump())

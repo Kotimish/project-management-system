@@ -9,3 +9,4 @@ class RegistrateUserRequest(BaseModel):
 
 class RegistrateUserResponse(BaseModel):
     id: int
+    login: str

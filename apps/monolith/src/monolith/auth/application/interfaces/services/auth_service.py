@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from monolith.auth.application.dtos.token import AccessTokenDTO
 from monolith.auth.application.dtos.user import LoginUserResponse, LoginUserCommand
 
 
@@ -19,3 +20,9 @@ class IAuthenticationService(ABC):
     async def refresh_access_token(self, refresh_token: str) -> str:
         """Обновление токена пользователя"""
         raise NotImplementedError
+
+    @abstractmethod
+    async def validate_access(self, access_token: str) -> AccessTokenDTO:
+        """Декодирование и проверка на актуальность токена пользователя с возвратом данных"""
+        raise NotImplementedError
+

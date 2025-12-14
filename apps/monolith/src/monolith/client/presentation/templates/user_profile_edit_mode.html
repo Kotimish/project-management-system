@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="text-center mb-0">Профиль пользователя</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/profile/update" id="profileForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
+
+                    <div class="mb-3">
+                        <label for="display_name" class="form-label"><strong>Отображаемое имя:</strong></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="display_name"
+                            name="display_name"
+                            value="{{ user.display_name }}"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label"><strong>Имя:</strong></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="first_name"
+                            name="first_name"
+                            value="{{ user.first_name if user.first_name else '' }}"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="middle_name" class="form-label"><strong>Отчество:</strong></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="middle_name"
+                            name="middle_name"
+                            value="{{ user.middle_name if user.middle_name else '' }}"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label"><strong>Фамилия:</strong></label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="last_name"
+                            name="last_name"
+                            value="{{ user.last_name if user.last_name else '' }}"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label"><strong>Описание:</strong></label>
+                        <textarea
+                            class="form-control"
+                            id="description"
+                            name="description"
+                            rows="3"
+                            >
+                            {{ user.description if user.description else '' }}
+                        </textarea>
+                    </div>
+
+<!--                    <div class="mb-3">-->
+<!--                        <label for="birthdate" class="form-label"><strong>Дата рождения:</strong></label>-->
+<!--                        <input-->
+<!--                            type="date"-->
+<!--                            class="form-control"-->
+<!--                            id="birthdate"-->
+<!--                            name="birthdate"-->
+<!--                            value="{{ user.birthdate.strftime('%Y-%m-%d') if user.birthdate else '' }}"-->
+<!--                        >-->
+<!--                    </div>-->
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label"><strong>Телефон:</strong></label>
+                        <input
+                            type="tel"
+                            class="form-control"
+                            id="phone"
+                            name="phone"
+                            value="{{ user.phone if user.phone else '' }}"
+                        >
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/profile" class="btn btn-secondary">Отмена</a>
+                        <button type="submit" class="btn btn-success">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

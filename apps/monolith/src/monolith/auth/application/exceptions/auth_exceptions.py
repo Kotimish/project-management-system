@@ -16,6 +16,7 @@ class InvalidLoginException(AuthException):
 class NotFoundUserException(AuthException):
     """Исключение попытки найти несуществующего пользователя по id"""
 
+
 class InactiveUserException(AuthException):
     """Исключение для деактивированного пользователя"""
 
@@ -27,5 +28,10 @@ class InvalidSessionException(AuthException):
 class InactiveSessionException(AuthException):
     """Исключение для деактивированной сессии пользователя"""
 
+
 class InvalidRoleException(AuthException):
     """Исключение для несуществующей роли пользователя"""
+
+
+class ExpiredTokenException(AuthException):
+    """Исключение для токена с истекшим временем действия"""
