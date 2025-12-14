@@ -28,6 +28,6 @@ class Project(IdMixin, TimestampMixin):
 
     def _validate(self):
         if not self.name:
-            raise exceptions.InvalidProjectNameException("Task status name is required")
+            raise exceptions.InvalidProjectNameException("Project name is required")
         if not self.owner_id:
-            raise exceptions.InvalidProjectOwnerIdException("Task status slug is required")
+            raise exceptions.InvalidProjectOwnerIdException("Project owner id is required")
