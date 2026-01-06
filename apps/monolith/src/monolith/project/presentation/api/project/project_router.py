@@ -24,14 +24,7 @@ async def search_projects(
 
     # Преобразование в DTO
     return [
-        ProjectSchema(
-            id=project.id,
-            name=project.name,
-            description=project.description,
-            owner_id=project.owner_id,
-            created_at=project.created_at,
-            updated_at=project.updated_at,
-        )
+        ProjectSchema(**project.model_dump())
         for project in projects
     ]
 
@@ -45,14 +38,7 @@ async def create_project(
         owner_id=data.owner_id,
         description=data.description,
     )
-    return ProjectSchema(
-        id=project.id,
-        name=project.name,
-        description=project.description,
-        owner_id=project.owner_id,
-        created_at=project.created_at,
-        updated_at=project.updated_at,
-    )
+    return ProjectSchema(**project.model_dump())
 
 
 @router.get("/{project_id}")
@@ -78,11 +64,4 @@ async def update_project(
         project_id,
         command
     )
-    return ProjectSchema(
-        id=project.id,
-        name=project.name,
-        description=project.description,
-        owner_id=project.owner_id,
-        created_at=project.created_at,
-        updated_at=project.updated_at,
-    )
+    return ProjectSchema(**project.model_dump())

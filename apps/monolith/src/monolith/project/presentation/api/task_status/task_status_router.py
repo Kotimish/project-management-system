@@ -16,12 +16,7 @@ async def get_task_statuses(
 ) -> list[TaskStatusResponse]:
     all_statuses = await service.get_all_statuses()
     return [
-        TaskStatusResponse(
-            name=status.name,
-            slug=status.slug,
-            description=status.description,
-            status_id=status.id,
-        )
+        TaskStatusResponse(**status.model_dump())
         for status in all_statuses
     ]
 
@@ -32,9 +27,4 @@ async def get_task_status(
         service: ITaskStatusService = Depends(get_task_status_service)
 ) -> TaskStatusResponse:
     status = await service.get_status_by_id(task_status_id)
-    return TaskStatusResponse(
-        name=status.name,
-        slug=status.slug,
-        description=status.description,
-        status_id=status.id,
-    )
+    return TaskStatusResponse(**status.model_dump())

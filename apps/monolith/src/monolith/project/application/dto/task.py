@@ -10,12 +10,12 @@ class UpdateTaskCommand(BaseModel):
     sprint_id: int | None = None
 
 
-class TaskResponse(BaseModel):
+class TaskDTO(BaseModel):
     """Данные для ответа на запрос о получение информации о задаче"""
     id: int
+    title: str | None
+    description: str | None
     project_id: int
     status_id: int
     assignee_id: int | None
     sprint_id: int | None = None
-    title: str | None
-    description: str | None

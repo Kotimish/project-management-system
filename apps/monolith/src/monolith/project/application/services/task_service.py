@@ -1,10 +1,10 @@
+from monolith.project.application.dto import task as dto
 from monolith.project.application.dto import task as task_dto
 from monolith.project.application.interfaces.factories.task_factory import ITaskFactory
 from monolith.project.application.interfaces.services.task_service import ITaskService
 from monolith.project.application.interfaces.services.task_status_service import ITaskStatusService
 from monolith.project.domain.exceptions.task_exception import TaskNotFoundError, TaskUnauthorizedError
 from monolith.project.domain.interfaces.repositories.task_repository import ITaskRepository
-from monolith.project.domain.model import Task
 
 
 class TaskService(ITaskService):
@@ -27,23 +27,76 @@ class TaskService(ITaskService):
             assignee_id: int | None = None,
             sprint_id: int | None = None,
             description: str | None = None
-    ) -> Task:
+    ) -> dto.TaskDTO:
         status = await self.task_status_service.get_default_status()
         task = self.factory.create(title, project_id, status.id, assignee_id, sprint_id, description)
         task = await self.repository.add(task)
-        return task
+        return dto.TaskDTO(
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            project_id=task.project_id,
+            status_id=task.status_id,
+            assignee_id=task.assignee_id,
+            sprint_id=task.sprint_id,
+        )
 
-    async def get_task_by_id(self, task_id: int) -> Task:
-        return await self.repository.get_by_id(task_id)
+    async def get_task_by_id(self, task_id: int) -> dto.TaskDTO:
+        task = await self.repository.get_by_id(task_id)
+        return dto.TaskDTO(
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            project_id=task.project_id,
+            status_id=task.status_id,
+            assignee_id=task.assignee_id,
+            sprint_id=task.sprint_id,
+        )
 
-    async def get_list_tasks_by_assignee_id(self, assignee_id: int) -> list[Task]:
-        return await self.repository.get_list_tasks_by_assignee(assignee_id)
+    async def get_list_tasks_by_assignee_id(self, assignee_id: int) -> list[dto.TaskDTO]:
+        tasks = await self.repository.get_list_tasks_by_assignee(assignee_id)
+        return [
+            dto.TaskDTO(
+                id=task.id,
+                title=task.title,
+                description=task.description,
+                project_id=task.project_id,
+                status_id=task.status_id,
+                assignee_id=task.assignee_id,
+                sprint_id=task.sprint_id,
+            )
+            for task in tasks
+        ]
 
-    async def get_list_tasks_by_project(self, project_id: int) -> list[Task]:
-        return await self.repository.get_list_tasks_by_project(project_id)
+    async def get_list_tasks_by_project(self, project_id: int) -> list[dto.TaskDTO]:
+        tasks = await self.repository.get_list_tasks_by_project(project_id)
+        return [
+            dto.TaskDTO(
+                id=task.id,
+                title=task.title,
+                description=task.description,
+                project_id=task.project_id,
+                status_id=task.status_id,
+                assignee_id=task.assignee_id,
+                sprint_id=task.sprint_id,
+            )
+            for task in tasks
+        ]
 
-    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[Task]:
-        return await self.repository.get_list_tasks_by_sprint(sprint_id)
+    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[dto.TaskDTO]:
+        tasks = await self.repository.get_list_tasks_by_sprint(sprint_id)
+        return [
+            dto.TaskDTO(
+                id=task.id,
+                title=task.title,
+                description=task.description,
+                project_id=task.project_id,
+                status_id=task.status_id,
+                assignee_id=task.assignee_id,
+                sprint_id=task.sprint_id,
+            )
+            for task in tasks
+        ]
 
     async def delete_task(self, task_id: int) -> bool:
         return await self.repository.remove(task_id)
@@ -54,7 +107,7 @@ class TaskService(ITaskService):
             sprint_id: int,
             task_id: int,
             data: task_dto.UpdateTaskCommand
-    ) -> Task:
+    ) -> dto.TaskDTO:
         task = await self.repository.get_by_id(task_id)
         if task is None:
             raise TaskNotFoundError(f"Task with id \"{project_id}\" not found")
@@ -73,10 +126,26 @@ class TaskService(ITaskService):
             task.description = data.description
         task.touch()
         task = await self.repository.update(task_id, task)
-        return task
+        return dto.TaskDTO(
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            project_id=task.project_id,
+            status_id=task.status_id,
+            assignee_id=task.assignee_id,
+            sprint_id=task.sprint_id,
+        )
 
-    async def add_task_to_sprint(self, task_id: int, sprint_id: int) -> Task:
+    async def add_task_to_sprint(self, task_id: int, sprint_id: int) -> dto.TaskDTO:
         task = await self.repository.get_by_id(task_id)
         task.sprint_id = sprint_id
         task = await self.repository.update(task_id, task)
-        return task
+        return dto.TaskDTO(
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            project_id=task.project_id,
+            status_id=task.status_id,
+            assignee_id=task.assignee_id,
+            sprint_id=task.sprint_id,
+        )

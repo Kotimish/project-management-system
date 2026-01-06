@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class TaskStatusResponse(BaseModel):
+class TaskStatusDTO(BaseModel):
     id: int
     name: str
     slug: str

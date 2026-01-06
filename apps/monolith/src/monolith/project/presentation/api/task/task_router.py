@@ -27,15 +27,7 @@ async def create_task(
         sprint_id,
         data.description
     )
-    return TaskResponse(
-        id=task.id,
-        title=task.title,
-        description=task.description,
-        project_id=task.project_id,
-        status_id=task.status_id,
-        assignee_id=task.assignee_id,
-        sprint_id=task.sprint_id,
-    )
+    return TaskResponse(**task.model_dump())
 
 
 @router.get("/{task_id}", response_model=TaskView)
@@ -59,15 +51,7 @@ async def update_task(
 ):
     update_task_dto = task_dto.UpdateTaskCommand(**data.model_dump())
     task = await service.update_task(project_id, sprint_id, task_id, update_task_dto)
-    return TaskResponse(
-        id=task.id,
-        title=task.title,
-        description=task.description,
-        project_id=task.project_id,
-        status_id=task.status_id,
-        assignee_id=task.assignee_id,
-        sprint_id=task.sprint_id,
-    )
+    return TaskResponse(**task.model_dump())
 
 
 @router.delete("/{task_id}")

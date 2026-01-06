@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from monolith.project.application.dto import task as task_dto
 from monolith.project.domain.model import Task
+from monolith.project.application.dto import task as dto
 
 
 class ITaskService(ABC):
@@ -15,27 +16,27 @@ class ITaskService(ABC):
             assignee_id: int | None = None,
             sprint_id: int | None = None,
             description: str | None = None
-    ) -> Task:
+    ) -> dto.TaskDTO:
         """Создание новой задачи"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_task_by_id(self, task_id: int) -> Task:
+    async def get_task_by_id(self, task_id: int) -> dto.TaskDTO:
         """Получить задачу по id"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list_tasks_by_assignee_id(self, assignee_id: int) -> list[Task]:
+    async def get_list_tasks_by_assignee_id(self, assignee_id: int) -> list[dto.TaskDTO]:
         """Получить задачу по id ответственного"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list_tasks_by_project(self, project_id: int) -> list[Task]:
+    async def get_list_tasks_by_project(self, project_id: int) -> list[dto.TaskDTO]:
         """Получить задачу по id проекта"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[Task]:
+    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[dto.TaskDTO]:
         """Получить задачу по id спринта"""
         raise NotImplementedError
 
@@ -51,11 +52,11 @@ class ITaskService(ABC):
             sprint_id: int,
             task_id: int,
             data: task_dto.UpdateTaskCommand
-    ) -> Task:
+    ) -> dto.TaskDTO:
         """Обновить задачу"""
         raise NotImplementedError
 
     @abstractmethod
-    async def add_task_to_sprint(self, task_id: int, sprint_id: int) -> Task:
+    async def add_task_to_sprint(self, task_id: int, sprint_id: int) -> dto.TaskDTO:
         """Добавить задачу в спринт"""
         raise NotImplementedError

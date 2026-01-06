@@ -10,10 +10,10 @@ class UpdateSprintCommand(BaseModel):
     end_date: date | None
 
 
-class SprintResponse(BaseModel):
+class SprintDTO(BaseModel):
     """Данные для ответа на запрос о получение информации о спринте"""
     id: int
-    project_id: int
     name: str | None
+    project_id: int
     start_date: date
     end_date: date

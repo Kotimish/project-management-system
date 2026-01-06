@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -7,8 +9,11 @@ class UpdateProjectCommand(BaseModel):
     description: str | None
 
 
-class ProjectResponse(BaseModel):
+class ProjectDTO(BaseModel):
     """Данные для ответа на запрос о получение проекта"""
     id: int
     name: str | None
     description: str | None
+    owner_id: int
+    created_at: datetime
+    updated_at: datetime

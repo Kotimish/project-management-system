@@ -23,13 +23,7 @@ async def get_sprints(
         sprints = await service.get_all_sprint_by_project_id(project_id)
     # Преобразование в DTO
     return [
-        SprintResponse(
-            id=sprint.id,
-            name=sprint.name,
-            project_id=sprint.project_id,
-            start_date=sprint.start_date,
-            end_date=sprint.end_date,
-        )
+        SprintResponse(**sprint.model_dump())
         for sprint in sprints
     ]
 
@@ -46,13 +40,7 @@ async def create_sprint(
         start_date=data.start_date,
         end_date=data.end_date,
     )
-    return SprintResponse(
-        id=sprint.id,
-        name=sprint.name,
-        project_id=sprint.project_id,
-        start_date=sprint.start_date,
-        end_date=sprint.end_date,
-    )
+    return SprintResponse(**sprint.model_dump())
 
 
 @router.get("/{sprint_id}", response_model=SprintView)
@@ -79,10 +67,4 @@ async def update_sprint(
         end_date=data.end_date,
     )
     sprint = await service.update_sprint(project_id, sprint_id, command)
-    return SprintResponse(
-        id=sprint.id,
-        name=sprint.name,
-        project_id=sprint.project_id,
-        start_date=sprint.start_date,
-        end_date=sprint.end_date,
-    )
+    return SprintResponse(**sprint.model_dump())
