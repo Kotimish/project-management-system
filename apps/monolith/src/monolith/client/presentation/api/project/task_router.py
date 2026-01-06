@@ -10,9 +10,11 @@ from monolith.client.application.dtos import task as task_dto
 from monolith.client.application.dtos import user_profile as profile_dto
 from monolith.client.application.interfaces.services.sprint_service import ISprintService
 from monolith.client.application.interfaces.services.task_service import ITaskService
+from monolith.client.application.interfaces.services.task_status_service import ITaskStatusService
 from monolith.client.presentation.api.dependencies import get_current_user
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
-from monolith.client.presentation.api.project.dependencies import get_task_service, get_sprint_service
+from monolith.client.presentation.api.project.dependencies import get_task_service, get_sprint_service, \
+    get_task_status_service
 from monolith.client.presentation.api.utils import render_message
 from monolith.client.presentation.schemas import user_profile as profile_schemas
 from monolith.client.presentation.schemas import views
@@ -125,12 +127,13 @@ async def create_task(
 
 
 @router.get("/{task_id}/edit", response_class=HTMLResponse, include_in_schema=False)
-async def update_project_page(
+async def update_task_page(
         request: Request,
         project_id: int,
         sprint_id: int,
         task_id: int,
-        service: ITaskService = Depends(get_task_service),
+        task_service: ITaskService = Depends(get_task_service),
+        status_service: ITaskStatusService = Depends(get_task_status_service),
         current_user: profile_dto.GetUserProfileResponse = Depends(get_current_user),
 ):
     """Страница редактирования спринта"""
@@ -142,7 +145,7 @@ async def update_project_page(
             button_text="Перейти на страницу входа"
         )
     try:
-        task_view = await service.get_task_by_id(project_id, sprint_id, task_id)
+        task_view = await task_service.get_task_by_id(project_id, sprint_id, task_id)
     except Exception as e:
         return render_message(
             request,
@@ -150,6 +153,17 @@ async def update_project_page(
             back_url=f"/projects/{project_id}/sprints/{sprint_id}",
             button_text="Вернуться на страницу списка задач",
         )
+    try:
+        statuses = await status_service.get_task_statuses()
+    except Exception as e:
+        return render_message(
+            request,
+            message=str(e),
+            back_url=f"/projects/{project_id}/sprints/{sprint_id}",
+            button_text="Вернуться на страницу списка задач",
+        )
+
+
     schema = profile_schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_sprint_update_breadcrumbs(
         views.ProjectReference(
@@ -169,6 +183,7 @@ async def update_project_page(
         "sprint": task_view.sprint,
         "task": task_view.task,
         "breadcrumbs": breadcrumbs,
+        "statuses": statuses,
         "errors": None
     }
     return templates.TemplateResponse(
@@ -178,7 +193,7 @@ async def update_project_page(
 
 
 @router.post("/{task_id}/edit", response_class=HTMLResponse, include_in_schema=False)
-async def update_sprint(
+async def update_task(
         request: Request,
         project_id: int,
         sprint_id: int,
@@ -197,6 +212,8 @@ async def update_sprint(
         )
 
     update_task_dto = task_dto.UpdateTaskCommand(
+        title=data.title,
+        status_id=data.status,
         description=data.description
     )
     try:

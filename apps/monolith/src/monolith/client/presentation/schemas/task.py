@@ -8,6 +8,7 @@ class CreateTaskSchema(BaseModel):
 
 
 class UpdateTaskSchema(BaseModel):
-    """Схема для запроса создания задачи"""
+    """Схема для запроса изменения задачи"""
     title: str | None = None
+    status: int | None = None
     description: str | None = None

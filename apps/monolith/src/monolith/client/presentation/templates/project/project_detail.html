@@ -79,7 +79,7 @@
                 <td>{{sprint.start_date}} — {{sprint.end_date}}</td>
                 <td class="align-middle">
                     {% set progress = (sprint.completed_tasks / sprint.total_tasks) * 100 %}
-                    <div class="progress" style="height: 20px;">
+                    <div class="progress position-relative" style="height: 20px;">
                         <div
                                 class="progress-bar progress-bar-striped progress-bar-warning"
                                 role="progressbar"
@@ -87,7 +87,8 @@
                                 aria-valuemin="0"
                                 aria-valuemax="100"
                                 style="width: {{ progress | round(2) }}%;"
-                        >
+                        ></div>
+                        <div class="justify-content-center d-flex position-absolute w-100 h-100 align-items-center">
                             {{ progress | round(2) }}% ({{ sprint.completed_tasks }} / {{ sprint.total_tasks }})
                         </div>
                     </div>

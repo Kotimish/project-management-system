@@ -24,6 +24,16 @@
                     {% endif %}
                 </div>
                 <div class="mb-3">
+                    <label for="title" class="form-label">Статус</label>
+                    <select class="form-control" id="statusSelect" name="status">
+                        {% for status in statuses %}
+                            <option value="{{ status.id }}" {% if status.id == task.status.id %}selected{% endif %}>
+                                {{ status.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label for="description" class="form-label">Описание</label>
                     <textarea
                             class="form-control {% if errors and errors.get('description') %}is-invalid{% endif %}"
