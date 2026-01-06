@@ -11,6 +11,7 @@ class TaskFactory(ITaskFactory):
             project_id: int,
             status_id: int,
             assignee_id: int | None = None,
+            sprint_id: int | None = None,
             description: str | None = None,
     ) -> Task:
         return Task(
@@ -19,4 +20,5 @@ class TaskFactory(ITaskFactory):
             project_id=project_id,
             status_id=status_id,
             assignee_id=assignee_id,
+            sprint_id=sprint_id,
         )
