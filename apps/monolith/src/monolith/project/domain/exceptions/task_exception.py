@@ -22,4 +22,12 @@ class InvalidAssigneeIdException(TaskException):
 
 
 class InvalidSpringIdException(TaskException):
-    """Исключение для некорректного или отсутствующего id спринга проекта"""
+    """Исключение для некорректного или отсутствующего id спринта проекта"""
+
+
+class TaskNotFoundError(TaskException):
+    """Исключение для несуществующей Задачи"""
+
+
+class TaskUnauthorizedError(TaskException):
+    """Исключение при попытке получения доступа к Задаче без соответствующих прав"""

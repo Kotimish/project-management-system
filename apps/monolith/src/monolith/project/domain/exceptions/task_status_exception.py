@@ -11,3 +11,7 @@ class InvalidTaskStatusNameException(TaskStatusException):
 
 class InvalidTaskStatusSlugException(TaskStatusException):
     """Исключение для некорректного или отсутствующего сокращенного названия статуса задачи"""
+
+
+class TaskStatusNotFoundError(TaskStatusException):
+    """Исключение для несуществующего Статус Задачи"""

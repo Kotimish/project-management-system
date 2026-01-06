@@ -11,3 +11,7 @@ class InvalidProjectNameException(ProjectException):
 
 class InvalidProjectOwnerIdException(ProjectException):
     """Исключение для некорректного или отсутствующего id владельца проекта"""
+
+
+class ProjectNotFoundError(ProjectException):
+    """Исключение для несуществующего Проекта"""

@@ -15,3 +15,12 @@ class InvalidProjectIdException(SprintException):
 
 class InvalidSpingDateException(SprintException):
     """"Исключение для некорректных или отсутствующих дат спринта"""
+
+
+class SprintNotFoundError(SprintException):
+    """Исключение для несуществующего Спринта"""
+
+
+class SprintUnauthorizedError(SprintException):
+    """Исключение при попытке получения доступа к Спринту без соответствующих прав"""
+
