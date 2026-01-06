@@ -28,6 +28,14 @@
     </div>
   </div>
 </div>
-
-{% include 'guest_content.html' %}
+<!-- Основной контент -->
+<main class="container-fluid">
+    {% if current_user %}
+        <!-- Подключаем подшаблон для авторизованного пользователя -->
+        {% include 'index/user_dashboard.html' %}
+    {% else %}
+        <!-- Подключаем подшаблон для гостя -->
+        {% include 'index/guest_content.html' %}
+    {% endif %}
+</main>
 {% endblock %}

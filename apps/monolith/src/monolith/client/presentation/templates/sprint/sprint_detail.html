@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Спринт — {{ sprint.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1>{{ sprint.name }}</h1>
+                    <p class="text-muted">
+                        <strong>Период:</strong>
+                        {{ sprint.start_date.strftime('%d.%m.%Y') }} – {{ sprint.end_date.strftime('%d.%m.%Y') }}
+                    </p>
+                </div>
+                <div>
+                    <!-- Кнопки действий со спринтом проекта -->
+                    <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}/edit"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Редактировать
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-danger">
+                        Удалить
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <!-- Общая информация о спринте -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h5>Основная информация</h5>
+            <dl class="row">
+<!--                <dt class="col-sm-4">ID спринта:</dt>-->
+<!--                <dd class="col-sm-8">{{ sprint.id }}</dd>-->
+
+                <dt class="col-sm-4">Проект:</dt>
+                <dd class="col-sm-8">
+                    <a href="/projects/{{ project.id }}">{{ project.name }}</a>
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Секция задач спринта -->
+
+    <div class="row sprint_tasks">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Задачи</h2>
+            <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}/tasks/create" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Добавить задачу
+            </a>
+        </div>
+
+        {% if tasks %}
+        <table class="table table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th>Название</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{task.title or "Без названия"}}</td>
+                <td>{{task.status.name}}</td>
+                <td>
+                    <a href="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Детали
+                    </a>
+                    <a href="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}/edit"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Редактировать
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-danger">
+                        Удалить
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info">
+            В этом спринте пока нет задач.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

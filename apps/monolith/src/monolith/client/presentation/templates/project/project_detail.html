@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1>{{ project.name }}</h1>
+                </div>
+                <div>
+                    <!-- Кнопки действий с проектом -->
+                    <a href="/projects/{{ project.id }}/edit"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Редактировать
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-danger">
+                        Удалить
+                    </a>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <!-- Владелец проекта -->
+<!--                        <dt class="col-sm-4">Владелец:</dt>-->
+<!--                        <dd class="col-sm-8">{{ project.owner_id }}</dd>-->
+
+                        <dt class="col-sm-4">Дата создания:</dt>
+                        <dd class="col-sm-8">{{ project.created_at.strftime('%d.%m.%Y %H:%M') }}</dd>
+
+                        <dt class="col-sm-4">Дата обновления:</dt>
+                        <dd class="col-sm-8">{{ project.updated_at.strftime('%d.%m.%Y %H:%M') }}</dd>
+                    </dl>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3">
+                    <h3>Описание:</h3>
+                </div>
+                {% if project.description %}
+                <p>{{ project.description }}</p>
+                {% else %}
+                <div class="alert alert-info">
+                    В этом проекте отсутствует описание.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Спринты Проекты-->
+    <div class="project-sprints">
+
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2>Спринты</h2>
+            <a href="/projects/{{ project.id }}/sprints/create" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Добавить спринт
+            </a>
+        </div>
+        {% if sprints %}
+        <table class="table table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th>Название</th>
+                <th>Даты</th>
+                <th>Задачи (выполнено / всего)</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sprint in sprints %}
+            <tr>
+                <td>{{sprint.name or "Без названия"}}</td>
+                <td>{{sprint.start_date}} — {{sprint.end_date}}</td>
+                <td>{{sprint.completed_tasks}} / {{sprint.total_tasks}}</td>
+                <td>
+                    <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Детали
+                    </a>
+                    <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}/edit"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Редактировать
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-danger">
+                        Удалить
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    В проекте пока нет спринтов.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
