@@ -9,10 +9,12 @@ from pydantic import SecretStr
 
 from monolith.client.application.dtos.user import CreateUserCommand, LoginUserCommand
 from monolith.client.application.interfaces.services.client_service import IClientService
+from monolith.client.presentation.api.auth import breadcrumbs as auth_breadcrumbs
 from monolith.client.presentation.api.dependencies import get_client_service, get_current_user
 from monolith.client.presentation.api.utils import render_message
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.presentation.schemas import user_profile as schemas
+from monolith.client.presentation.schemas.breadcrumb import Breadcrumb
 from monolith.config.settings import BASE_DIR, settings, Environment
 
 router = APIRouter(
@@ -23,12 +25,12 @@ router = APIRouter(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 templates = Jinja2Templates(
-    directory= BASE_DIR / "src" / "monolith" / "client" / "presentation" / "templates"
+    directory=BASE_DIR / "src" / "monolith" / "client" / "presentation" / "templates"
 )
 
 
 @router.get("/register", response_class=HTMLResponse, include_in_schema=False)
-async def get_register(
+async def get_register_page(
         request: Request,
         current_user: dto.GetUserProfileResponse = Depends(get_current_user)
 ):
@@ -42,8 +44,10 @@ async def get_register(
             button_text="Перейти на главную",
             current_user=schema.model_dump(),
         )
+    breadcrumbs = auth_breadcrumbs.get_auth_register_breadcrumbs()
     context = {
         "request": request,
+        "breadcrumbs": breadcrumbs
     }
     return templates.TemplateResponse(
         "register.html",
@@ -83,7 +87,7 @@ async def post_register(
 
 
 @router.get("/login", response_class=HTMLResponse, include_in_schema=False)
-async def get_login(
+async def get_login_page(
         request: Request,
         current_user: dto.GetUserProfileResponse = Depends(get_current_user)
 ):
@@ -97,8 +101,10 @@ async def get_login(
             button_text="Перейти на главную",
             current_user=schema.model_dump()
         )
+    breadcrumbs = auth_breadcrumbs.get_auth_login_breadcrumbs()
     context = {
         "request": request,
+        "breadcrumbs": breadcrumbs,
     }
     return templates.TemplateResponse(
         "login.html",
@@ -120,6 +126,7 @@ async def post_login(
             password=SecretStr(password)
         )
         tokens = await service.login(session)
+    # TODO добавить ошибку неправильного логина/пароля
     except Exception as e:
         return render_message(
             request,

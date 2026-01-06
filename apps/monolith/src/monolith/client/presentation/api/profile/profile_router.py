@@ -8,10 +8,12 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 
 from monolith.client.application.dtos import user_profile as dto
-from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
 from monolith.client.presentation.api.dependencies import get_current_user, get_user_profile_service
+from monolith.client.presentation.api.profile import breadcrumbs as profile_breadcrumbs
 from monolith.client.presentation.api.utils import render_message
+from monolith.client.presentation.schemas import user_profile as schemas
+from monolith.client.presentation.schemas.breadcrumb import Breadcrumb
 from monolith.config.settings import BASE_DIR
 
 router = APIRouter(
@@ -38,10 +40,12 @@ async def profile(
             button_text="Перейти на страницу входа"
         )
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
+    breadcrumbs = profile_breadcrumbs.get_profile_breadcrumbs()
     context = {
         "request": request,
         "user": schema.model_dump(),
         "page_title": "Профиль",
+        "breadcrumbs": breadcrumbs,
     }
     return templates.TemplateResponse(
         "user_profile.html",
@@ -63,10 +67,12 @@ async def profile_edit_page(
             button_text="Перейти на страницу входа"
         )
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
+    breadcrumbs = profile_breadcrumbs.get_profile_edit_breadcrumbs()
     context = {
         "request": request,
         "user": schema.model_dump(),
         "page_title": "Профиль",
+        "breadcrumbs": breadcrumbs,
     }
     return templates.TemplateResponse(
         "user_profile_edit_mode.html",

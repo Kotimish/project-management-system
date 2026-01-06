@@ -3,6 +3,7 @@ from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from monolith.client.presentation.api.client import breadcrumbs as client_breadcrumbs
 from monolith.client.presentation.api.dependencies import get_current_user
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.presentation.schemas import user_profile as schemas
@@ -27,12 +28,14 @@ async def index(
     if current_user is not None:
         schema = schemas.GetUserProfileResponse(**current_user.model_dump())
         user = schema.model_dump()
+    breadcrumbs = client_breadcrumbs.get_home_breadcrumb()
     context = {
         "request": request,
-        "user": user
+        "user": user,
+        "breadcrumbs": breadcrumbs
     }
     return templates.TemplateResponse(
-        "index.html",
+        "index/index.html",
         context
     )
 

@@ -48,10 +48,15 @@ async def get_current_user(
         request: Request,
         client_service: IClientService = Depends(get_client_service)
 ) -> dto.GetUserProfileResponse | None:
+    """
+    Возвращает информацию о текущем пользователе из токена.
+    При необходимости обновляет токен.
+    """
     access_token = request.cookies.get("access_token")
     if not access_token:
         return None
     user = await client_service.get_current_user(access_token)
     if not user:
+        # TODO в случае отсутствия пользователя в access token обновить его через refresh token
         return None
     return user
