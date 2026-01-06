@@ -50,7 +50,7 @@ class Task(IdIntPkMixin, TimestampMixin, Base):
     )
 
     def __str__(self):
-        return f"{self.__class__.__name__}(id={self.id}, name={self.name!r}, description={self.description!r})"
+        return f"{self.__class__.__name__}(id={self.id}, name={self.title!r}, description={self.description!r})"
 
     def __repr__(self):
         return str(self)

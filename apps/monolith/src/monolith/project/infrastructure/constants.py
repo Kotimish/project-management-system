@@ -1,0 +1,1 @@
+COMPLETED_STATUS_SLUG = 'done'

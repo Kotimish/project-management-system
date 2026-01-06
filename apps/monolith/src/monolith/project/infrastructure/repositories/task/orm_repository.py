@@ -1,9 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from monolith.project.domain.interfaces.repositories.task_repository import ITaskRepository
 from monolith.project.infrastructure.models import Task as ORMTask
-from monolith.project.domain.model import Task
+from monolith.project.infrastructure.models import TaskStatus as ORMStatus
+from monolith.project.domain.model import Task, TaskWithStatus, TaskStatus
 
 
 class TaskRepository(ITaskRepository):
@@ -115,28 +117,40 @@ class TaskRepository(ITaskRepository):
             for orm_task in orm_tasks
         ]
 
-    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[Task]:
+    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[TaskWithStatus]:
         statement = (
             select(ORMTask)
+            .options(selectinload(ORMTask.status))  # Подгружаем связанный ORMStatus
             .where(ORMTask.sprint_id==sprint_id)
-            .order_by(ORMTask.id)
         )
         result = await self.session.scalars(statement)
         orm_tasks = result.all()
-        return [
-            Task(
+
+        tasks = []
+        for orm_task in orm_tasks:
+            status = TaskStatus(
+                status_id=orm_task.status.id,
+                name=orm_task.status.name,
+                slug=orm_task.status.slug,
+                description=orm_task.status.description,
+                created_at=orm_task.status.created_at,
+                updated_at=orm_task.status.updated_at
+            )
+            task =  TaskWithStatus(
                 task_id=orm_task.id,
                 title=orm_task.title,
                 description=orm_task.description,
                 project_id=orm_task.project_id,
                 status_id=orm_task.status_id,
+                status=status,
                 assignee_id=orm_task.assignee_id,
                 sprint_id=orm_task.sprint_id,
                 created_at=orm_task.created_at,
                 updated_at=orm_task.updated_at,
             )
-            for orm_task in orm_tasks
-        ]
+            tasks.append(task)
+
+        return tasks
 
     async def update(self, task_id: int, task: Task) -> Task | None:
         orm_task = await self._get_by_id(task_id)

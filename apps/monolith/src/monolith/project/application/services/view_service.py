@@ -11,6 +11,7 @@ from monolith.project.domain.interfaces.repositories.project_repository import I
 from monolith.project.domain.interfaces.repositories.sprint_repository import ISprintRepository
 from monolith.project.domain.interfaces.repositories.task_repository import ITaskRepository
 from monolith.project.domain.interfaces.repositories.task_status_repository import ITaskStatusRepository
+from monolith.project.infrastructure.constants import COMPLETED_STATUS_SLUG
 
 
 class ViewService(IViewService):
@@ -38,13 +39,12 @@ class ViewService(IViewService):
         tasks = await self.task_repository.get_list_tasks_by_sprint(sprint_id)
         dto_tasks = []
         for task in tasks:
-            status = await self.task_status_repository.get_by_id(task.status_id)
-            if status is None:
-                raise TaskStatusNotFoundError(f"Task Status with id \"{task.status_id}\" not found")
+            if task.status is None:
+                raise TaskStatusNotFoundError(f"Task with id \"{task.id}\" don't have status")
             dto_status = views.TaskStatusReference(
-                id=status.id,
-                name=status.name,
-                slug=status.slug
+                id=task.status.id,
+                name=task.status.name,
+                slug=task.status.slug
             )
             dto_task = views.TaskWithStatusDetail(
                 id=task.id,
@@ -71,13 +71,15 @@ class ViewService(IViewService):
         dto_sprints = []
         for sprint in sprints:
             dto_tasks = await self._get_dto_tasks_with_status_by_sprint_id(sprint.id)
+            total_tasks = len(dto_tasks)
+            completed_tasks = sum(task.status.slug == COMPLETED_STATUS_SLUG for task in dto_tasks)
             dto_sprint = views.SprintWithTaskDetail(
                 id=sprint.id,
                 name=sprint.name,
                 start_date=sprint.start_date,
                 end_date=sprint.end_date,
-                total_tasks=len(dto_tasks),
-                completed_tasks=len(dto_tasks),
+                total_tasks=total_tasks,
+                completed_tasks=completed_tasks,
                 created_at=sprint.created_at,
                 updated_at=sprint.updated_at
             )
@@ -103,12 +105,17 @@ class ViewService(IViewService):
         if sprint.project_id != project_id:
             raise SprintUnauthorizedError("Sprint does not belong to project")
         dto_tasks = await self._get_dto_tasks_with_status_by_sprint_id(sprint.id)
+        total_tasks = len(dto_tasks)
+        completed_tasks = sum(task.status.slug == COMPLETED_STATUS_SLUG for task in dto_tasks)
+
         dto_project = await self._get_dto_project_reference_by_id(project_id)
-        dto_sprint = views.SprintDetail(
+        dto_sprint = views.SprintWithTaskDetail(
             id=sprint.id,
             name=sprint.name,
             start_date=sprint.start_date,
             end_date=sprint.end_date,
+            total_tasks=total_tasks,
+            completed_tasks=completed_tasks,
             created_at=sprint.created_at,
             updated_at=sprint.updated_at
         )

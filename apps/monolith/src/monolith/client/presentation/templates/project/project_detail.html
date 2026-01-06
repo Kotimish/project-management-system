@@ -27,8 +27,8 @@
                 <div class="col-md-6">
                     <dl class="row">
                         <!-- Владелец проекта -->
-<!--                        <dt class="col-sm-4">Владелец:</dt>-->
-<!--                        <dd class="col-sm-8">{{ project.owner_id }}</dd>-->
+                        <!--                        <dt class="col-sm-4">Владелец:</dt>-->
+                        <!--                        <dd class="col-sm-8">{{ project.owner_id }}</dd>-->
 
                         <dt class="col-sm-4">Дата создания:</dt>
                         <dd class="col-sm-8">{{ project.created_at.strftime('%d.%m.%Y %H:%M') }}</dd>
@@ -77,7 +77,21 @@
             <tr>
                 <td>{{sprint.name or "Без названия"}}</td>
                 <td>{{sprint.start_date}} — {{sprint.end_date}}</td>
-                <td>{{sprint.completed_tasks}} / {{sprint.total_tasks}}</td>
+                <td class="align-middle">
+                    {% set progress = (sprint.completed_tasks / sprint.total_tasks) * 100 %}
+                    <div class="progress" style="height: 20px;">
+                        <div
+                                class="progress-bar progress-bar-striped progress-bar-warning"
+                                role="progressbar"
+                                aria-valuenow="{{ progress | round(2) }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                style="width: {{ progress | round(2) }}%;"
+                        >
+                            {{ progress | round(2) }}% ({{ sprint.completed_tasks }} / {{ sprint.total_tasks }})
+                        </div>
+                    </div>
+                </td>
                 <td>
                     <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}"
                        class="btn btn-sm btn-outline-secondary me-2"

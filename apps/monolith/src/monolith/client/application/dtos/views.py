@@ -99,7 +99,7 @@ class ProjectView(BaseModel):
 class SprintView(BaseModel):
     """Агрегат данные для отображения информации о спринте"""
     project: ProjectReference
-    sprint: SprintDetail
+    sprint: SprintWithTaskDetail
     tasks: list[TaskWithStatusDetail]
 
 
