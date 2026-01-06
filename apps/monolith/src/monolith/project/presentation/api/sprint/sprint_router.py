@@ -1,31 +1,88 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Query
+
+from monolith.project.application.dto.sprint import UpdateSprintCommand
+from monolith.project.application.interfaces.services.sprint_service import ISprintService
+from monolith.project.application.interfaces.services.view_service import IViewService
+from monolith.project.presentation.api.dependencies import get_sprint_service, get_view_service
+from monolith.project.presentation.schemas.sprint import CreateSprintRequest, SprintResponse, UpdateSprintRequest
+from monolith.project.presentation.schemas.views import SprintView
 
 router = APIRouter(
-    prefix="/sprint",
-    tags=["sprint"]
+    prefix="/projects/{project_id}/sprints",
+    tags=["sprints"]
 )
 
 
-@router.get("/")
-async def get_sprints():
-    pass
+@router.get("/", response_model=list[SprintResponse])
+async def get_sprints(
+        project_id: int,
+        service: ISprintService = Depends(get_sprint_service)
+) -> list[SprintResponse]:
+    sprints = []
+    if project_id is not None:
+        sprints = await service.get_all_sprint_by_project_id(project_id)
+    # Преобразование в DTO
+    return [
+        SprintResponse(
+            id=sprint.id,
+            name=sprint.name,
+            project_id=sprint.project_id,
+            start_date=sprint.start_date,
+            end_date=sprint.end_date,
+        )
+        for sprint in sprints
+    ]
 
 
-@router.post("/")
-async def create_sprint():
-    pass
+@router.post("/", response_model=SprintResponse)
+async def create_sprint(
+        project_id: int,
+        data: CreateSprintRequest,
+        service: ISprintService = Depends(get_sprint_service)
+) -> SprintResponse:
+    sprint = await service.create_sprint(
+        name=data.name,
+        project_id=project_id,
+        start_date=data.start_date,
+        end_date=data.end_date,
+    )
+    return SprintResponse(
+        id=sprint.id,
+        name=sprint.name,
+        project_id=sprint.project_id,
+        start_date=sprint.start_date,
+        end_date=sprint.end_date,
+    )
 
 
-@router.get("/{sprint_id}")
-async def get_sprint():
-    pass
+@router.get("/{sprint_id}", response_model=SprintView)
+async def get_sprint(
+        project_id: int,
+        sprint_id: int,
+        service: IViewService = Depends(get_view_service)
+) -> SprintView:
+    sprint = await service.get_sprint_detail(project_id, sprint_id)
+    return SprintView(**sprint.model_dump())
 
 
-@router.put("/{sprint_id}")
-async def update_sprint():
-    pass
-
-
-@router.delete("/{sprint_id}")
-async def delete_sprint():
-    pass
+@router.patch("/{sprint_id}", response_model=SprintResponse)
+async def update_sprint(
+        project_id: int,
+        sprint_id: int,
+        data: UpdateSprintRequest,
+        service: ISprintService = Depends(get_sprint_service)
+) -> SprintResponse:
+    # TODO сделать проверку project_id
+    command = UpdateSprintCommand(
+        name=data.name,
+        start_date=data.start_date,
+        end_date=data.end_date,
+    )
+    sprint = await service.update_sprint(project_id, sprint_id, command)
+    return SprintResponse(
+        id=sprint.id,
+        name=sprint.name,
+        project_id=sprint.project_id,
+        start_date=sprint.start_date,
+        end_date=sprint.end_date,
+    )

@@ -6,3 +6,4 @@ class URLConfig(BaseModel):
     """Настройки различных путей к сервисам"""
     auth_service: HttpUrl = Field(default="http://127.0.0.1:8000/")
     user_profile_service: HttpUrl = Field(default="http://127.0.0.1:8000/")
+    project_service: HttpUrl = Field(default="http://127.0.0.1:8000/")
