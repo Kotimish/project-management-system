@@ -24,6 +24,6 @@ class ISprintService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_sprint(self, sprint_id: int, data: UpdateSprintCommand) -> Sprint:
+    async def update_sprint(self, project_id: int, sprint_id: int, data: UpdateSprintCommand) -> Sprint:
         """Обновить данные спринта"""
         raise NotImplementedError

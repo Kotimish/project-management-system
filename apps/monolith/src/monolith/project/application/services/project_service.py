@@ -40,7 +40,7 @@ class ProjectService(IProjectService):
         if data.name is not None:
             project.name = data.name
         if data.description is not None:
-            project.name = data.description
+            project.description = data.description
         project.touch()
         project = await self.repository.update(project_id, project)
         return project
@@ -55,4 +55,4 @@ class ProjectService(IProjectService):
 
     async def remove_participant_from_project(self, project_id: int, user_id: int) -> bool:
         # TODO требуется проверка на владельца проекта
-        return await self.remove_participant_from_project(project_id, user_id)
+        return await self.participant_service.remove_participant(project_id, user_id)

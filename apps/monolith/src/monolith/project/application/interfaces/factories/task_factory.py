@@ -13,6 +13,7 @@ class ITaskFactory(ABC):
             project_id: int,
             status_id: int,
             assignee_id: int | None,
+            sprint_id: int | None = None,
             description: str = None
     ) -> Task:
         raise NotImplementedError

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from monolith.project.application.dto import task as task_dto
 from monolith.project.domain.model import Task
 
 
@@ -12,6 +13,7 @@ class ITaskService(ABC):
             title: str,
             project_id: int,
             assignee_id: int | None = None,
+            sprint_id: int | None = None,
             description: str | None = None
     ) -> Task:
         """Создание новой задачи"""
@@ -43,13 +45,14 @@ class ITaskService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def assign_task(self, task_id: int, assignee_id: int) -> Task:
-        """Назначить или обновить ответственного в задаче"""
-        raise NotImplementedError
-
-    @abstractmethod
-    async def update_task_status(self, task_id: int, status_id: int) -> Task:
-        """Назначить или обновить ответственного в задаче"""
+    async def update_task(
+            self,
+            project_id: int,
+            sprint_id: int,
+            task_id: int,
+            data: task_dto.UpdateTaskCommand
+    ) -> Task:
+        """Обновить задачу"""
         raise NotImplementedError
 
     @abstractmethod
