@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+<!--Блок стилей-->
+{% block style %}
+.hero-section {
+    padding: 100px 0;
+    background-color: #f8f9fa; /* Светлый фон */
+    text-align: center;
+}
+.features-section {
+    padding: 60px 0;
+}
+.feature-card {
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s ease-in-out;
+}
+{% endblock %}
+<!--Основной Блок-->
+{% block title %}Главная{% endblock %}
+{% block content %}
+<!--Заглушка -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+    </div>
+  </div>
+</div>
+
+{% include 'guest_content.html' %}
+{% endblock %}
