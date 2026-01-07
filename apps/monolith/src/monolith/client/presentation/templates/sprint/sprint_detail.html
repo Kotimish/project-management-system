@@ -56,7 +56,11 @@
         </div>
 
         <!-- Прогресс выполнения задач -->
+        {% if sprint.total_tasks > 0 %}
         {% set progress = (sprint.completed_tasks / sprint.total_tasks) * 100 %}
+        {% else %}
+        {% set progress = 0 %}
+        {% endif %}
         <div class="project-progress pull-left">
             <div class="progress position-relative" style="height: 25px;">
                 <div

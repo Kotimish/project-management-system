@@ -78,7 +78,11 @@
                 <td>{{sprint.name or "Без названия"}}</td>
                 <td>{{sprint.start_date}} — {{sprint.end_date}}</td>
                 <td class="align-middle">
+                    {% if sprint.total_tasks > 0 %}
                     {% set progress = (sprint.completed_tasks / sprint.total_tasks) * 100 %}
+                    {% else %}
+                    {% set progress = 0 %}
+                    {% endif %}
                     <div class="progress position-relative" style="height: 20px;">
                         <div
                                 class="progress-bar progress-bar-striped progress-bar-warning"
