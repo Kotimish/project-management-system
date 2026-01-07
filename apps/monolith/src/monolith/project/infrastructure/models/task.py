@@ -7,7 +7,7 @@ from monolith.project.infrastructure.models import Base
 from monolith.project.infrastructure.models.mixins import IdIntPkMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from monolith.project.infrastructure.models import Project, TaskStatus, Sprint
+    from monolith.project.infrastructure.models import Project, TaskStatus, Sprint, Participant
 
 
 class Task(IdIntPkMixin, TimestampMixin, Base):
@@ -23,8 +23,11 @@ class Task(IdIntPkMixin, TimestampMixin, Base):
     )
     # Задача может быть без ответственного
     assignee_id: Mapped[int] = mapped_column(
-        Integer,
+        ForeignKey('participants.id'),
         nullable=True,
+    )
+    assignee: Mapped['Participant'] = relationship(
+        back_populates='tasks'
     )
     project_id: Mapped[int] = mapped_column(
         ForeignKey('projects.id'),
