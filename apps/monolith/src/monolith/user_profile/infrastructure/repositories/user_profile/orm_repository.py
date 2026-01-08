@@ -52,7 +52,10 @@ class ORMUserProfileRepository(IUserProfileRepository):
         )
 
     async def get_by_auth_user_id(self, auth_user_id: int) -> UserProfile | None:
-        statement = select(ORMUserProfile).where(ORMUserProfile.auth_user_id == auth_user_id)
+        statement = (
+            select(ORMUserProfile)
+            .where(ORMUserProfile.auth_user_id == auth_user_id)
+        )
         result = await self.session.execute(statement)
         orm_profile = result.scalar_one_or_none()
         if not orm_profile:
@@ -68,6 +71,29 @@ class ORMUserProfileRepository(IUserProfileRepository):
             birthdate=orm_profile.birthdate,
             phone=orm_profile.phone
         )
+
+    async def get_by_auth_user_ids(self, auth_user_ids: list[int]) -> list[UserProfile]:
+        statement = (
+            select(ORMUserProfile)
+            .where(ORMUserProfile.auth_user_id.in_(auth_user_ids))
+            .order_by(ORMUserProfile.id)
+        )
+        result = await self.session.scalars(statement)
+        orm_profiles = result.all()
+        return [
+            UserProfile(
+                profile_id=orm_profile.id,
+                auth_user_id=orm_profile.auth_user_id,
+                display_name=orm_profile.display_name,
+                first_name=orm_profile.first_name,
+                middle_name=orm_profile.middle_name,
+                last_name=orm_profile.last_name,
+                description=orm_profile.description,
+                birthdate=orm_profile.birthdate,
+                phone=orm_profile.phone,
+            )
+            for orm_profile in orm_profiles
+        ]
 
     async def get_all(self) -> list[UserProfile]:
         statement = select(ORMUserProfile).order_by(ORMUserProfile.id)

@@ -18,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 @router.get("/{user_id}", response_model=schemas.GetUserProfileResponse)
-async def get_user_profile(
+async def get_user_profile_by_id(
         user_id: int,
         service: IUserProfileService = Depends(get_user_profile_service)
 ):
@@ -27,12 +27,31 @@ async def get_user_profile(
 
 
 @router.get("/by_auth_user_id/{auth_user_id}", response_model=schemas.GetUserProfileResponse)
-async def get_user_profile(
+async def get_user_profile_by_auth_user_id(
         auth_user_id: int,
         service: IUserProfileService = Depends(get_user_profile_service)
 ):
     user = await service.get_profile_by_auth_user_id(auth_user_id)
     return schemas.GetUserProfileResponse(**user.model_dump())
+
+
+@router.post("/by_auth_user_id", response_model=list[schemas.GetUserProfileResponse])
+async def get_user_profiles_by_auth_user_ids(
+        data: schemas.UserProfilesRequest,
+        service: IUserProfileService = Depends(get_user_profile_service)
+):
+    """
+    Метод обработки запроса на получение списка профилей пользователей
+    по внешним id пользователей из сервиса авторизации.
+
+    Примечание: Из-за необходимости передачи списка всех id
+    используется POST запрос вместо GET как BULT GET запрос.
+    """
+    profiles = await service.get_profiles_by_auth_user_ids(data.ids)
+    return [
+        schemas.GetUserProfileResponse(**profile.model_dump())
+        for profile in profiles
+    ]
 
 
 @router.post("/", response_model=schemas.CreateUserProfileResponse)

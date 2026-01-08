@@ -3,7 +3,7 @@ from datetime import datetime
 from monolith.project.domain.model import Task, TaskStatus
 
 
-class TaskWithStatus(Task):
+class TaskView(Task):
     """Доменная модель Задачи с агрегированными значениями"""
 
     def __init__(
@@ -14,6 +14,7 @@ class TaskWithStatus(Task):
             status_id: int,
             status: TaskStatus,
             assignee_id: int | None,
+            auth_user_id: int | None,
             sprint_id: int | None = None,
             task_id: int | None = None,
             created_at: datetime | None = None,
@@ -33,3 +34,4 @@ class TaskWithStatus(Task):
         )
         # Обязательные атрибуты
         self.status = status
+        self.auth_user_id = auth_user_id

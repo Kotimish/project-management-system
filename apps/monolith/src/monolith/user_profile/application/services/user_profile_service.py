@@ -54,6 +54,27 @@ class UserProfileService(IUserProfileService):
             phone=profile.phone
         )
 
+    async def get_profiles_by_auth_user_ids(self, auth_user_ids: list[int]) -> list[dto.GetUserProfileResponse]:
+        if not auth_user_ids:
+            return []
+        profiles = await self.repository.get_by_auth_user_ids(auth_user_ids)
+        return [
+            dto.GetUserProfileResponse(
+                id=profile.id,
+                auth_user_id=profile.auth_user_id,
+                display_name=profile.display_name,
+                created_at=profile.created_at,
+                updated_at=profile.updated_at,
+                first_name=profile.first_name,
+                middle_name=profile.middle_name,
+                last_name=profile.last_name,
+                description=profile.description,
+                birthdate=profile.birthdate,
+                phone=profile.phone
+            )
+            for profile in profiles
+        ]
+
     async def update_profile(
             self,
             profile_id: int,
