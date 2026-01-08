@@ -17,8 +17,8 @@ class TaskService(ITaskService):
                 f"/api/projects/{project_id}/sprints/{sprint_id}/tasks/",
             )
             tasks = [
-                dto.TaskDTO.model_validate(raw_project)
-                for raw_project in raw_tasks
+                dto.TaskDTO.model_validate(raw_task)
+                for raw_task in raw_tasks
             ]
             return tasks
         except exceptions.HTTPStatusError:

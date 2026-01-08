@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from monolith.project.domain.model import Task, TaskWithStatus
+from monolith.project.domain.model import Task, TaskView
 
 
 class ITaskRepository(ABC):
@@ -38,7 +38,7 @@ class ITaskRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[TaskWithStatus]:
+    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[TaskView]:
         """Получить задачу по id спринта"""
         raise NotImplementedError
 

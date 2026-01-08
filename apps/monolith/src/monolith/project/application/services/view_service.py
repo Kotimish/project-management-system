@@ -1,5 +1,6 @@
 from monolith.project.application.dto import views
 from monolith.project.application.interfaces.services.view_service import IViewService
+from monolith.project.domain.exceptions.participant_exception import ParticipantNotFoundError
 # Исключения
 from monolith.project.domain.exceptions.project_exception import ProjectNotFoundError
 from monolith.project.domain.exceptions.sprint_exception import SprintNotFoundError, SprintUnauthorizedError
@@ -151,12 +152,25 @@ class ViewService(IViewService):
             name=status.name,
             slug=status.slug
         )
+
+        if task.assignee_id:
+            participant = await self.participant_repository.get_by_id(task.assignee_id)
+            if participant is None:
+                raise ParticipantNotFoundError(f"Participant with id \"{task.assignee_id}\" not found")
+            dto_participant = views.ParticipantReference(
+                id=participant.id,
+                auth_user_id=participant.auth_user_id,
+                project_id=participant.project_id,
+            )
+        else:
+            dto_participant = None
+
         dto_task = views.TaskDetail(
             id=task.id,
-            assignee_id=task.assignee_id,
             title=task.title,
             description=task.description,
             status=dto_status,
+            assignee=dto_participant,
             created_at=task.created_at,
             updated_at=task.updated_at
         )

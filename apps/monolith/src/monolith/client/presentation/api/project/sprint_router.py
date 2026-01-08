@@ -35,7 +35,7 @@ async def get_sprints_by_project_id(
         project_id: int,
         service: ISprintService = Depends(get_sprint_service),
         project_service: IProjectService = Depends(get_project_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница списков проектов"""
     if current_user is None:
@@ -89,7 +89,7 @@ async def create_sprint_page(
         request: Request,
         project_id: int,
         project_service: IProjectService = Depends(get_project_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница создания спринта в проекте"""
     if current_user is None:
@@ -137,7 +137,7 @@ async def create_sprint(
         start_date: Annotated[date, Form()],
         end_date: Annotated[date, Form()],
         service: ISprintService = Depends(get_sprint_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Запрос создания спринта в проекте"""
     if current_user is None:
@@ -181,7 +181,7 @@ async def update_project_page(
         project_id: int,
         sprint_id: int,
         service: ISprintService = Depends(get_sprint_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница редактирования спринта"""
     if current_user is None:
@@ -235,7 +235,7 @@ async def update_sprint(
         start_date: Annotated[date, Form()],
         end_date: Annotated[date, Form()],
         service: ISprintService = Depends(get_sprint_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Запрос на редактирование проекта"""
     if current_user is None:
@@ -283,7 +283,7 @@ async def get_sprint_by_id(
         project_id: int,
         sprint_id: int,
         service: ISprintService = Depends(get_sprint_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница спринта проекта"""
     if current_user is None:

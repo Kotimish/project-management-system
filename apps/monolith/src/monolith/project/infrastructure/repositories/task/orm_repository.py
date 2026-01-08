@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from monolith.project.domain.interfaces.repositories.task_repository import ITaskRepository
 from monolith.project.infrastructure.models import Task as ORMTask
 from monolith.project.infrastructure.models import TaskStatus as ORMStatus
-from monolith.project.domain.model import Task, TaskWithStatus, TaskStatus
+from monolith.project.domain.model import Task, TaskView, TaskStatus
 
 
 class TaskRepository(ITaskRepository):
@@ -117,7 +117,7 @@ class TaskRepository(ITaskRepository):
             for orm_task in orm_tasks
         ]
 
-    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[TaskWithStatus]:
+    async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[TaskView]:
         statement = (
             select(ORMTask)
             .options(selectinload(ORMTask.status))  # Подгружаем связанный ORMStatus
@@ -136,7 +136,7 @@ class TaskRepository(ITaskRepository):
                 created_at=orm_task.status.created_at,
                 updated_at=orm_task.status.updated_at
             )
-            task =  TaskWithStatus(
+            task = TaskView(
                 task_id=orm_task.id,
                 title=orm_task.title,
                 description=orm_task.description,

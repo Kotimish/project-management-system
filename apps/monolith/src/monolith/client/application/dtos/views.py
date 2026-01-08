@@ -5,6 +5,12 @@ from pydantic import BaseModel
 
 # --- Упрощенные DTO для DTO агрегатов ---
 
+class ParticipantReference(BaseModel):
+    """Данные об участнике проекта"""
+    id: int
+    auth_user_id: int
+    project_id: int
+
 class TaskStatusDetail(BaseModel):
     """Данные о статусе задачи"""
     id: int
@@ -23,10 +29,10 @@ class TaskStatusReference(BaseModel):
 class TaskDetail(BaseModel):
     """Данные о задаче"""
     id: int
-    assignee_id: int | None
     title: str | None
     description: str | None
     status: TaskStatusReference
+    assignee: ParticipantReference | None
     created_at: datetime
     updated_at: datetime
 

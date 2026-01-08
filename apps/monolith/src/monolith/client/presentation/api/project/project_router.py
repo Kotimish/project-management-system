@@ -31,7 +31,7 @@ templates = Jinja2Templates(
 async def get_list_projects(
         request: Request,
         project_service: IProjectService = Depends(get_project_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница списков проектов"""
     if current_user is None:
@@ -70,7 +70,7 @@ async def get_list_projects(
 @router.get("/create", response_class=HTMLResponse, include_in_schema=False)
 async def create_project_page(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница создания проекта"""
     if current_user is None:
@@ -101,7 +101,7 @@ async def create_project(
         name: Annotated[str, Form()],
         description: Annotated[str, Form()] = None,
         project_service: IProjectService = Depends(get_project_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Запрос создания проекта"""
     if current_user is None:
@@ -143,7 +143,7 @@ async def update_project_page(
         request: Request,
         project_id: int,
         project_service: IProjectService = Depends(get_project_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница редактирования проекта"""
     if current_user is None:
@@ -190,7 +190,7 @@ async def update_project(
         name: Annotated[str, Form()],
         description: Annotated[str, Form()] = None,
         project_service: IProjectService = Depends(get_project_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Запрос на редактирование проекта"""
     if current_user is None:
@@ -235,7 +235,7 @@ async def get_project_by_id(
         request: Request,
         project_id: int,
         project_service: IProjectService = Depends(get_project_service),
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница проекта"""
     if current_user is None:

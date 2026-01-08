@@ -14,7 +14,6 @@ class TaskView(Task):
             status_id: int,
             status: TaskStatus,
             assignee_id: int | None,
-            auth_user_id: int | None,
             sprint_id: int | None = None,
             task_id: int | None = None,
             created_at: datetime | None = None,
@@ -34,4 +33,3 @@ class TaskView(Task):
         )
         # Обязательные атрибуты
         self.status = status
-        self.auth_user_id = auth_user_id

@@ -116,9 +116,17 @@ class TaskService(ITaskService):
         if task.project_id != project_id:
             raise TaskUnauthorizedError("Task does not belong to project")
 
+        if data.title is not None:
+            task.title = data.title
         if data.status_id is not None:
             task.status_id = data.status_id
-        if data.assignee_id is not None:
+        if (
+                data.assignee_id is not None or
+                (
+                        data.assignee_id is None and
+                        task.assignee_id is not None
+                )
+        ):
             task.assignee_id = data.assignee_id
         if data.sprint_id is not None:
             task.sprint_id = data.sprint_id

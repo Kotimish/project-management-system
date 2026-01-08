@@ -8,13 +8,17 @@ from starlette.responses import RedirectResponse
 
 from monolith.client.application.dtos import task as task_dto
 from monolith.client.application.dtos import user_profile as profile_dto
+from monolith.client.application.interfaces.services.composite import IProjectTeamService
+from monolith.client.application.interfaces.services.participant_service import IParticipantService
 from monolith.client.application.interfaces.services.sprint_service import ISprintService
 from monolith.client.application.interfaces.services.task_service import ITaskService
 from monolith.client.application.interfaces.services.task_status_service import ITaskStatusService
-from monolith.client.presentation.api.dependencies import get_current_user
+from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
+from monolith.client.presentation.api.dependencies import get_current_user, get_participant_with_profile_service, \
+    get_user_profile_service
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_task_service, get_sprint_service, \
-    get_task_status_service
+    get_task_status_service, get_participant_service
 from monolith.client.presentation.api.utils import render_message
 from monolith.client.presentation.schemas import user_profile as profile_schemas
 from monolith.client.presentation.schemas import views
@@ -37,7 +41,8 @@ async def create_task_page(
         project_id: int,
         sprint_id: int,
         sprint_service: ISprintService = Depends(get_sprint_service),
-        current_user: profile_dto.GetUserProfileResponse = Depends(get_current_user),
+        participant_service: IProjectTeamService = Depends(get_participant_with_profile_service),
+        current_user: profile_dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница создания задачи спринта в проекте"""
     if current_user is None:
@@ -56,6 +61,16 @@ async def create_task_page(
             back_url=f"/projects/{project_id}/sprints/{sprint_id}",
             button_text="Вернуться на страницу списка задач",
         )
+    try:
+        participants = await participant_service.get_participants_by_project(project_id)
+    except Exception as e:
+        return render_message(
+            request,
+            message=str(e),
+            back_url=f"/projects/{project_id}/sprints/{sprint_id}",
+            button_text="Вернуться на страницу списка задач",
+        )
+
     user_schema = profile_schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_task_create_breadcrumbs(
         views.ProjectReference(
@@ -73,6 +88,7 @@ async def create_task_page(
         "page_title": "Создание задачи",
         "project": sprint_view.project,
         "sprint": sprint_view.sprint,
+        "participants": participants,
         "breadcrumbs": breadcrumbs,
         "errors": None,
     }
@@ -89,7 +105,7 @@ async def create_task(
         sprint_id: int,
         data: Annotated[CreateTaskSchema, Form()],
         service: ITaskService = Depends(get_task_service),
-        current_user: profile_dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: profile_dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Запрос создания задачи спринта в проекте"""
     if current_user is None:
@@ -102,7 +118,7 @@ async def create_task(
     create_task_dto = task_dto.CreateTaskCommand(
         title=data.title,
         description=data.description,
-        assignee_id=None,
+        assignee_id=data.assignee,
     )
     try:
         task = await service.create_task(project_id, sprint_id, create_task_dto)
@@ -134,7 +150,8 @@ async def update_task_page(
         task_id: int,
         task_service: ITaskService = Depends(get_task_service),
         status_service: ITaskStatusService = Depends(get_task_status_service),
-        current_user: profile_dto.GetUserProfileResponse = Depends(get_current_user),
+        participant_service: IProjectTeamService = Depends(get_participant_with_profile_service),
+        current_user: profile_dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница редактирования спринта"""
     if current_user is None:
@@ -155,6 +172,15 @@ async def update_task_page(
         )
     try:
         statuses = await status_service.get_task_statuses()
+    except Exception as e:
+        return render_message(
+            request,
+            message=str(e),
+            back_url=f"/projects/{project_id}/sprints/{sprint_id}",
+            button_text="Вернуться на страницу списка задач",
+        )
+    try:
+        participants = await participant_service.get_participants_by_project(project_id)
     except Exception as e:
         return render_message(
             request,
@@ -184,6 +210,7 @@ async def update_task_page(
         "task": task_view.task,
         "breadcrumbs": breadcrumbs,
         "statuses": statuses,
+        "participants": participants,
         "errors": None
     }
     return templates.TemplateResponse(
@@ -200,7 +227,7 @@ async def update_task(
         task_id: int,
         data: Annotated[UpdateTaskSchema, Form()],
         service: ITaskService = Depends(get_task_service),
-        current_user: profile_dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: profile_dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Запрос на редактирование проекта"""
     if current_user is None:
@@ -214,7 +241,8 @@ async def update_task(
     update_task_dto = task_dto.UpdateTaskCommand(
         title=data.title,
         status_id=data.status,
-        description=data.description
+        assignee_id=data.assignee,
+        description=data.description,
     )
     try:
         task = await service.update_task(
@@ -250,8 +278,9 @@ async def get_task_by_id(
         project_id: int,
         sprint_id: int,
         task_id: int,
-        service: ITaskService = Depends(get_task_service),
-        current_user: profile_dto.GetUserProfileResponse = Depends(get_current_user),
+        task_service: ITaskService = Depends(get_task_service),
+        profile_service: IUserProfileService = Depends(get_user_profile_service),
+        current_user: profile_dto.UserProfileDTO = Depends(get_current_user),
 ):
     """Страница Задачи"""
     if current_user is None:
@@ -263,7 +292,7 @@ async def get_task_by_id(
         )
 
     try:
-        task_view = await service.get_task_by_id(project_id, sprint_id, task_id)
+        task_view = await task_service.get_task_by_id(project_id, sprint_id, task_id)
     except Exception as e:
         return render_message(
             request,
@@ -279,6 +308,21 @@ async def get_task_by_id(
             back_url=f"/projects/{project_id}/sprints/{sprint_id}",
             button_text="Перейти на страницу списка задач"
         )
+
+    if task_view.task.assignee:
+        try:
+            profile = await profile_service.get_profile_by_auth_user_id(task_view.task.assignee.auth_user_id)
+        except Exception as e:
+            return render_message(
+                request,
+                message=str(e),
+                back_url=f"/projects/{project_id}/sprints/{sprint_id}",
+                button_text="Вернуться на страницу списка задач",
+            )
+    else:
+        profile = None
+
+
 
     user_schema = profile_schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_task_detail_breadcrumbs(
@@ -302,6 +346,7 @@ async def get_task_by_id(
         "project": task_view.project,
         "sprint": task_view.sprint,
         "task": task_view.task,
+        "profile": profile,
         "breadcrumbs": breadcrumbs,
         "errors": None,
     }

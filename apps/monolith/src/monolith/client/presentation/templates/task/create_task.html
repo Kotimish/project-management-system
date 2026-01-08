@@ -27,6 +27,24 @@
                     {% endif %}
                 </div>
                 <div class="mb-3">
+                    <label for="assigneeSelect" class="form-label">Ответственный</label>
+                    <select class="form-control" id="assigneeSelect" name="assignee">
+                        <option
+                                value=""
+                                selected
+                        >
+                            — Не назначен —
+                        </option>
+                        {% for participant in participants %}
+                            <option
+                                    value="{{ participant.participant_id }}"
+                            >
+                                {{ participant.display_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label for="description" class="form-label">Описание</label>
                     <textarea
                             class="form-control {% if errors and errors.get('description') %}is-invalid{% endif %}"
