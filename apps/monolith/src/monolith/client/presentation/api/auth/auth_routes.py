@@ -32,7 +32,7 @@ templates = Jinja2Templates(
 @router.get("/register", response_class=HTMLResponse, include_in_schema=False)
 async def get_register_page(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница регистрации нового пользователя"""
     if current_user is not None:
@@ -89,7 +89,7 @@ async def post_register(
 @router.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def get_login_page(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница авторизации пользователя"""
     if current_user is not None:

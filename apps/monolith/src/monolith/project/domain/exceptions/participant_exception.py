@@ -2,7 +2,7 @@ from monolith.project.domain.exceptions.base_exception import BaseProjectExcepti
 
 
 class ParticipantException(BaseProjectException):
-    """Базовое исключение для доменной модели Участники"""
+    """Базовое исключение для доменной модели Участники проекта"""
 
 
 class InvalidProjectAuthUserIdException(BaseProjectException):
@@ -11,3 +11,7 @@ class InvalidProjectAuthUserIdException(BaseProjectException):
 
 class InvalidProjectProjectIdException(BaseProjectException):
     """Исключение для некорректного или отсутствующего id проекта"""
+
+
+class ParticipantNotFoundError(ParticipantException):
+    """Исключение для несуществующего Участника проекта"""

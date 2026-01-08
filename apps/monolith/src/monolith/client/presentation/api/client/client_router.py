@@ -21,7 +21,7 @@ templates = Jinja2Templates(
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def index(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Главная страница сайта"""
     user = None
@@ -43,7 +43,7 @@ async def index(
 @router.get("/about", response_class=HTMLResponse, include_in_schema=False)
 async def about(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница о программе"""
     user = None

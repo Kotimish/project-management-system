@@ -29,7 +29,7 @@ templates = Jinja2Templates(
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def profile(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница профиля пользователя"""
     if current_user is None:
@@ -56,7 +56,7 @@ async def profile(
 @router.get("/edit", response_class=HTMLResponse, include_in_schema=False)
 async def profile_edit_page(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница профиля пользователя (в режиме редактирования)"""
     if current_user is None:
@@ -90,7 +90,7 @@ async def update_profile(
         description: Annotated[str | None, Form()] = None,
         birthdate: Annotated[date | None, Form()] = None,
         phone: Annotated[str | None, Form()] = None,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
         profile_service: IUserProfileService = Depends(get_user_profile_service)
 ):
     """Запрос на обновление профиля"""

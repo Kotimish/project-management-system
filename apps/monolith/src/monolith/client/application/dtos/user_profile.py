@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CreateUserProfileCommand(BaseModel):
@@ -13,7 +13,8 @@ class CreateUserProfileResponse(BaseModel):
     """Данные для ответа на запрос создания профиля пользователя"""
     id: int
 
-class GetUserProfileResponse(BaseModel):
+
+class UserProfileDTO(BaseModel):
     """Данные для ответа на запрос получения профиля пользователя"""
     id: int
     auth_user_id: int
@@ -43,3 +44,10 @@ class UpdateUserProfileResponse(BaseModel):
     """Данные для ответа на запрос обновления профиля пользователя"""
     id: int
 
+
+class UserProfilesRequest(BaseModel):
+    """Данные для запроса множества профилей пользователей"""
+    ids: list[int] = Field(
+        min_length=1,
+        max_length=100,
+    )

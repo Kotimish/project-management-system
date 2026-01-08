@@ -5,11 +5,14 @@ from monolith.client.application.dtos import user_profile as dto
 from monolith.client.application.interfaces.client import IApiClient
 from monolith.client.application.interfaces.services.auth_service import IAuthService
 from monolith.client.application.interfaces.services.client_service import IClientService
+from monolith.client.application.interfaces.services.composite import IProjectTeamService
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
 from monolith.client.application.services.auth_service import AuthService
 from monolith.client.application.services.client_service import ClientService
+from monolith.client.application.services.composite import ProjectTeamService
 from monolith.client.application.services.user_profile_service import UserProfileService
 from monolith.client.infrastructure.clients.http_client import HttpxApiClient
+from monolith.client.presentation.api.project.dependencies import get_participant_service
 from monolith.config.settings import settings
 
 
@@ -44,10 +47,19 @@ def get_client_service() -> IClientService:
     )
 
 
+def get_participant_with_profile_service() -> IProjectTeamService:
+    participant_service = get_participant_service()
+    profile_service = get_user_profile_service()
+    return ProjectTeamService(
+        participant_service=participant_service,
+        profile_service=profile_service,
+    )
+
+
 async def get_current_user(
         request: Request,
         client_service: IClientService = Depends(get_client_service)
-) -> dto.GetUserProfileResponse | None:
+) -> dto.UserProfileDTO | None:
     """
     Возвращает информацию о текущем пользователе из токена.
     При необходимости обновляет токен.

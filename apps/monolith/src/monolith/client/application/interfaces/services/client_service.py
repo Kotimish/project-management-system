@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from monolith.client.application.dtos import user
-from monolith.client.application.dtos.user_profile import GetUserProfileResponse
+from monolith.client.application.dtos.user_profile import UserProfileDTO
 
 
 class IClientService(ABC):
@@ -22,6 +22,6 @@ class IClientService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_current_user(self, access_token: str) -> GetUserProfileResponse | None:
+    async def get_current_user(self, access_token: str) -> UserProfileDTO | None:
         """Получить информацию о пользователе, отправившем запрос"""
         raise NotImplementedError
