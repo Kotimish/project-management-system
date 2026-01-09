@@ -117,12 +117,14 @@
                     <div>
                         <div class="d-flex justify-content-between align-items-start">
                             <h4 class="card-title mb-4">Личные данные</h4>
+                            {% if profile.auth_user_id == user.auth_user_id %}
                             <a
                                     href="/profiles/{{user.auth_user_id}}/edit"
                                     class="btn btn-sm btn-outline-secondary me-2"
                             >
                                 Редактировать
                             </a>
+                            {% endif %}
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered mb-0">
