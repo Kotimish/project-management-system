@@ -26,7 +26,7 @@
             {% if user %}
                 <!-- Ссылки для авторизированного пользователя -->
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="/profile">Пользователь {{user.display_name}}</a>
+                    <a class="nav-link text-dark" href="/profiles/{{ user.auth_user_id }}">Пользователь {{user.display_name}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="/logout">Выйти</a>

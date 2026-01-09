@@ -7,10 +7,20 @@
     <title>{% block title %}Базовый шаблон{% endblock%}</title>
     <!-- Bootstrap CSS -->
     <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
             rel="stylesheet"
-            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
             crossorigin="anonymous"
+    >
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"
+    ></script>
+    <!--  Bootstrap Icons CSS  -->
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     >
     <!-- Блок Стилей -->
     <style>
@@ -24,76 +34,76 @@
             border-radius: .25rem;
         }
 
-.breadcrumb.breadcrumb-custom {
-  padding: 0 0;
-  border-color: #dbe3e6;
-}
+        .breadcrumb.breadcrumb-custom {
+          padding: 0 0;
+          border-color: #dbe3e6;
+        }
 
-.breadcrumb {
-  border: 1px solid #f3f3f3;
-}
+        .breadcrumb {
+          border: 1px solid #f3f3f3;
+        }
 
-.breadcrumb.breadcrumb-custom .breadcrumb-item {
-  font-size: 17px;
-  background: #dbe3e6;
-  padding: 8px 8px;
-  color: #000;
-}
+        .breadcrumb.breadcrumb-custom .breadcrumb-item {
+          font-size: 17px;
+          background: #dbe3e6;
+          padding: 8px 8px;
+          color: #000;
+        }
 
-a:link {
-  text-decoration: none;
-}
+        a:link {
+          text-decoration: none;
+        }
 
-.breadcrumb.breadcrumb-custom .breadcrumb-item a {
-  position: relative;
-  color: inherit;
-  border: 1px solid #dbe3e6;
-  padding-left: 10px;
-}
+        .breadcrumb.breadcrumb-custom .breadcrumb-item a {
+          position: relative;
+          color: inherit;
+          border: 1px solid #dbe3e6;
+          padding-left: 10px;
+        }
 
-.breadcrumb.breadcrumb-custom .breadcrumb-item a::before {
-  right: -21px;
-  z-index: 3;
-  border-left-color: #dbe3e6;
-  border-left-style: solid;
-  border-left-width: 12px;
-}
+        .breadcrumb.breadcrumb-custom .breadcrumb-item a::before {
+          right: -21px;
+          z-index: 3;
+          border-left-color: #dbe3e6;
+          border-left-style: solid;
+          border-left-width: 12px;
+        }
 
-.breadcrumb.breadcrumb-custom .breadcrumb-item a::after {
-  border-top: 21px solid transparent;
-  border-bottom: 22px solid transparent;
-  border-left: 12px solid #ffffff;
-  top: -9px;
-  right: -23px;
-}
+        .breadcrumb.breadcrumb-custom .breadcrumb-item a::after {
+          border-top: 21px solid transparent;
+          border-bottom: 22px solid transparent;
+          border-left: 12px solid #ffffff;
+          top: -9px;
+          right: -23px;
+        }
 
-.breadcrumb.breadcrumb-custom .breadcrumb-item:last-child {
-  background: transparent;
-  margin-left: 10px;
-}
+        .breadcrumb.breadcrumb-custom .breadcrumb-item:last-child {
+          background: transparent;
+          margin-left: 10px;
+        }
 
-.breadcrumb-item+.breadcrumb-item::before {
-  display: inline-block;
-  padding-right: 8px;
-  color: #6c757d;
-  content: "/";
-}
+        .breadcrumb-item+.breadcrumb-item::before {
+          display: inline-block;
+          padding-right: 8px;
+          color: #6c757d;
+          content: "/";
+        }
 
-.breadcrumb.breadcrumb-custom .breadcrumb-item::before {
-  content: "";
-  float: none;
-}
+        .breadcrumb.breadcrumb-custom .breadcrumb-item::before {
+          content: "";
+          float: none;
+        }
 
-.breadcrumb.breadcrumb-custom .breadcrumb-item a::before,
-.breadcrumb.breadcrumb-custom .breadcrumb-item a::after {
-  position: absolute;
-  top: -9px;
-  width: 0;
-  height: 0;
-  content: "";
-  border-top: 21px solid transparent;
-  border-bottom: 21px solid transparent;
-}
+        .breadcrumb.breadcrumb-custom .breadcrumb-item a::before,
+        .breadcrumb.breadcrumb-custom .breadcrumb-item a::after {
+          position: absolute;
+          top: -9px;
+          width: 0;
+          height: 0;
+          content: "";
+          border-top: 21px solid transparent;
+          border-bottom: 21px solid transparent;
+        }
         {% block style %}
         {% endblock %}
     </style>

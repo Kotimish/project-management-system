@@ -10,7 +10,7 @@
                 <h2 class="text-center mb-0">Профиль пользователя</h2>
             </div>
             <div class="card-body">
-                <form method="post" action="/profile/update" id="profileForm">
+                <form method="post" action="/profiles/{{user.auth_user_id}}/update" id="profileForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
 
                     <div class="mb-3">
@@ -64,9 +64,7 @@
                             id="description"
                             name="description"
                             rows="3"
-                            >
-                            {{ user.description if user.description else '' }}
-                        </textarea>
+                            >{{ user.description if user.description else '' }}</textarea>
                     </div>
 
                     <div class="mb-3">
@@ -92,7 +90,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="/profile" class="btn btn-secondary">Отмена</a>
+                        <a href="/profiles/{{user.auth_user_id}}" class="btn btn-secondary">Отмена</a>
                         <button type="submit" class="btn btn-success">Сохранить</button>
                     </div>
                 </form>
