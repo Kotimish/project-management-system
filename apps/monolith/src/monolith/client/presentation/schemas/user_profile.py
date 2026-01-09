@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class GetUserProfileResponse(BaseModel):
     """Данные для ответа на запрос получения профиля пользователя"""
+    auth_user_id: int
     display_name: str
     first_name: str | None
     middle_name: str | None

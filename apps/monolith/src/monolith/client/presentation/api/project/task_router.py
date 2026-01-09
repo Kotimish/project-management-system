@@ -8,8 +8,8 @@ from starlette.responses import RedirectResponse
 
 from monolith.client.application.dtos import task as task_dto
 from monolith.client.application.dtos import user_profile as profile_dto
+from monolith.client.application.exceptions import api_client_exception as exceptions
 from monolith.client.application.interfaces.services.composite import IProjectTeamService
-from monolith.client.application.interfaces.services.participant_service import IParticipantService
 from monolith.client.application.interfaces.services.sprint_service import ISprintService
 from monolith.client.application.interfaces.services.task_service import ITaskService
 from monolith.client.application.interfaces.services.task_status_service import ITaskStatusService
@@ -18,7 +18,7 @@ from monolith.client.presentation.api.dependencies import get_current_user, get_
     get_user_profile_service
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_task_service, get_sprint_service, \
-    get_task_status_service, get_participant_service
+    get_task_status_service
 from monolith.client.presentation.api.utils import render_message
 from monolith.client.presentation.schemas import user_profile as profile_schemas
 from monolith.client.presentation.schemas import views
@@ -54,7 +54,7 @@ async def create_task_page(
         )
     try:
         sprint_view = await sprint_service.get_sprint_by_id(project_id, sprint_id)
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message=str(e),
@@ -63,7 +63,7 @@ async def create_task_page(
         )
     try:
         participants = await participant_service.get_participants_by_project(project_id)
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message=str(e),
@@ -122,7 +122,7 @@ async def create_task(
     )
     try:
         task = await service.create_task(project_id, sprint_id, create_task_dto)
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message="Что-то пошло не так:" + str(e),
@@ -163,7 +163,7 @@ async def update_task_page(
         )
     try:
         task_view = await task_service.get_task_by_id(project_id, sprint_id, task_id)
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message=str(e),
@@ -172,7 +172,7 @@ async def update_task_page(
         )
     try:
         statuses = await status_service.get_task_statuses()
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message=str(e),
@@ -181,14 +181,13 @@ async def update_task_page(
         )
     try:
         participants = await participant_service.get_participants_by_project(project_id)
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message=str(e),
             back_url=f"/projects/{project_id}/sprints/{sprint_id}",
             button_text="Вернуться на страницу списка задач",
         )
-
 
     schema = profile_schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_sprint_update_breadcrumbs(
@@ -251,7 +250,7 @@ async def update_task(
             task_id,
             update_task_dto
         )
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message="Что-то пошло не так:" + str(e),
@@ -293,7 +292,7 @@ async def get_task_by_id(
 
     try:
         task_view = await task_service.get_task_by_id(project_id, sprint_id, task_id)
-    except Exception as e:
+    except exceptions.HTTPStatusError as e:
         return render_message(
             request,
             message=str(e),
@@ -312,7 +311,7 @@ async def get_task_by_id(
     if task_view.task.assignee:
         try:
             profile = await profile_service.get_profile_by_auth_user_id(task_view.task.assignee.auth_user_id)
-        except Exception as e:
+        except exceptions.HTTPStatusError as e:
             return render_message(
                 request,
                 message=str(e),
@@ -321,8 +320,6 @@ async def get_task_by_id(
             )
     else:
         profile = None
-
-
 
     user_schema = profile_schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_task_detail_breadcrumbs(

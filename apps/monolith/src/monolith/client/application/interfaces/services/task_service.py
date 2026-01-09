@@ -8,8 +8,8 @@ class ITaskService(ABC):
     """Интерфейс сервиса задач"""
 
     @abstractmethod
-    async def get_tasks_by_sprint_id(self, project_id: int, sprint_id: int) -> list[dto.TaskDTO]:
-        """Получить все задачи из спринта проекта"""
+    async def get_tasks_by_auth_user_id(self, auth_user_id: int) -> views.TaskListView | None:
+        """Получить все задачи пользователя"""
         raise NotImplementedError
 
     @abstractmethod

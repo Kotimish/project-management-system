@@ -11,6 +11,7 @@ class ParticipantReference(BaseModel):
     auth_user_id: int
     project_id: int
 
+
 class TaskStatusDetail(BaseModel):
     """Данные о статусе задачи"""
     id: int
@@ -37,9 +38,18 @@ class TaskDetail(BaseModel):
     updated_at: datetime
 
 
-class TaskWithStatusDetail(BaseModel):
+class TaskWithStatusReference(BaseModel):
     """Упрощенные данные о задаче со связанным статусом"""
     id: int
+    title: str | None
+    status: TaskStatusReference
+
+
+class TaskWithStatusDetail(BaseModel):
+    """Упрощенные данные о задаче со связанным статусом вне проекта"""
+    id: int
+    project_id: int
+    sprint_id: int
     title: str | None
     status: TaskStatusReference
 
@@ -106,7 +116,7 @@ class SprintView(BaseModel):
     """Агрегат данные для отображения информации о спринте"""
     project: ProjectReference
     sprint: SprintWithTaskDetail
-    tasks: list[TaskWithStatusDetail]
+    tasks: list[TaskWithStatusReference]
 
 
 class TaskView(BaseModel):
@@ -114,3 +124,8 @@ class TaskView(BaseModel):
     project: ProjectReference
     sprint: SprintReference
     task: TaskDetail
+
+
+class TaskListView(BaseModel):
+    """Агрегат данные для отображения информации о задачах"""
+    tasks: list[TaskWithStatusDetail]

@@ -11,18 +11,15 @@ class TaskService(ITaskService):
     def __init__(self, project_client: IApiClient):
         self.project_client = project_client
 
-    async def get_tasks_by_sprint_id(self, project_id: int, sprint_id: int) -> list[dto.TaskDTO]:
+    async def get_tasks_by_auth_user_id(self, auth_user_id: int) -> views.TaskListView | None:
         try:
             raw_tasks = await self.project_client.get(
-                f"/api/projects/{project_id}/sprints/{sprint_id}/tasks/",
+                f"/api/tasks/by_auth_user_id/{auth_user_id}",
             )
-            tasks = [
-                dto.TaskDTO.model_validate(raw_task)
-                for raw_task in raw_tasks
-            ]
+            tasks = views.TaskListView.model_validate(raw_tasks)
             return tasks
         except exceptions.HTTPStatusError:
-            return []
+            return None
 
     async def get_task_by_id(self, project_id: int, sprint_id: int, task_id: int) -> views.TaskView | None:
         try:
