@@ -17,6 +17,7 @@ from monolith.client.presentation.api.profile import breadcrumbs as profile_brea
 from monolith.client.presentation.api.project.dependencies import get_project_service, get_task_service
 from monolith.client.presentation.api.utils import render_message
 from monolith.client.presentation.schemas import user_profile as schemas
+from monolith.client.presentation.schemas.user_profile import UpdateUserProfileRequest
 from monolith.config.settings import BASE_DIR
 
 router = APIRouter(
@@ -93,18 +94,11 @@ async def get_update_profile_page(
 async def update_profile(
         request: Request,
         user_id: int,
-        display_name: Annotated[str, Form()],
-        first_name: Annotated[str | None, Form()] = None,
-        middle_name: Annotated[str | None, Form()] = None,
-        last_name: Annotated[str | None, Form()] = None,
-        description: Annotated[str | None, Form()] = None,
-        birthdate: Annotated[date | None, Form()] = None,
-        phone: Annotated[str | None, Form()] = None,
+        data: Annotated[UpdateUserProfileRequest, Form()],
         current_user: dto.UserProfileDTO = Depends(get_current_user),
         profile_service: IUserProfileService = Depends(get_user_profile_service)
 ):
     """Запрос на обновление профиля"""
-    # TODO объединить Annotated-параметры в модель
     if current_user is None:
         return render_message(
             request,
@@ -112,15 +106,7 @@ async def update_profile(
             back_url="/login",
             button_text="Перейти на страницу входа"
         )
-    update_dto = dto.UpdateUserProfileCommand(
-        display_name=display_name,
-        first_name=first_name,
-        middle_name=middle_name,
-        last_name=last_name,
-        description=description,
-        birthdate=birthdate,
-        phone=phone,
-    )
+    update_dto = dto.UpdateUserProfileCommand.model_validate(data.model_dump())
     access_token = request.cookies.get("access_token")
     await profile_service.update_profile(
         current_user.id,
