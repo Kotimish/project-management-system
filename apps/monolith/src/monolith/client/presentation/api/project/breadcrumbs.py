@@ -1,6 +1,6 @@
 from monolith.client.presentation.api.breadcrumbs import get_base_breadcrumbs
-from monolith.client.presentation.schemas.breadcrumb import Breadcrumb
 from monolith.client.presentation.schemas import views
+from monolith.client.presentation.schemas.breadcrumb import Breadcrumb
 
 
 # --- Навигационные цепочки для страниц проекта ---
@@ -74,6 +74,7 @@ def get_sprints_breadcrumbs(
     )
     return base
 
+
 def get_sprint_create_breadcrumbs(
         project: views.ProjectReference,
         is_active: bool = True
@@ -88,6 +89,7 @@ def get_sprint_create_breadcrumbs(
         )
     )
     return base
+
 
 def get_sprint_detail_breadcrumbs(
         project: views.ProjectReference,
@@ -105,6 +107,7 @@ def get_sprint_detail_breadcrumbs(
     )
     return base
 
+
 def get_sprint_update_breadcrumbs(
         project: views.ProjectReference,
         sprint: views.SprintReference,
@@ -121,10 +124,9 @@ def get_sprint_update_breadcrumbs(
     )
     return base
 
-
-
-# --- Навигационные цепочки для страниц задач ---
+    # --- Навигационные цепочки для страниц задач ---
     return base
+
 
 def get_task_create_breadcrumbs(
         project: views.ProjectReference,
@@ -132,7 +134,7 @@ def get_task_create_breadcrumbs(
         is_active: bool = True
 ) -> list[Breadcrumb]:
     """Возвращает Навигационную цепочку для страницы создания задачи спринта проекта"""
-    base = get_sprint_detail_breadcrumbs(project, sprint,False)
+    base = get_sprint_detail_breadcrumbs(project, sprint, False)
     base.append(
         Breadcrumb(
             name="Создание задачи",
@@ -142,6 +144,7 @@ def get_task_create_breadcrumbs(
     )
     return base
 
+
 def get_task_detail_breadcrumbs(
         project: views.ProjectReference,
         sprint: views.SprintReference,
@@ -149,11 +152,24 @@ def get_task_detail_breadcrumbs(
         is_active: bool = True
 ) -> list[Breadcrumb]:
     """Возвращает Навигационную цепочку для страницы задачи спринта проекта"""
-    base = get_sprint_detail_breadcrumbs(project, sprint,False)
+    base = get_sprint_detail_breadcrumbs(project, sprint, False)
     base.append(
         Breadcrumb(
             name=task.title,
             url=f"/projects/{project.id}/sprints/{sprint.id}/tasks/{task.id}",
+            is_active=is_active
+        )
+    )
+    return base
+
+
+def get_tasks_by_user_breadcrumbs(is_active: bool = True) -> list[Breadcrumb]:
+    """Возвращает Навигационную цепочку для страницы списка задач пользователя"""
+    base = get_base_breadcrumbs(is_active=False)
+    base.append(
+        Breadcrumb(
+            name="Задачи",
+            url="/tasks/by_auth_user_id/{user.auth_user_id}",
             is_active=is_active
         )
     )

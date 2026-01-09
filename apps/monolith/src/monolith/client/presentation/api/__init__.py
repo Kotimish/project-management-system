@@ -6,6 +6,7 @@ from monolith.client.presentation.api.profile.profile_router import router as pr
 from monolith.client.presentation.api.project.project_router import router as project_router
 from monolith.client.presentation.api.project.sprint_router import router as sprint_router
 from monolith.client.presentation.api.project.task_router import router as task_router
+from monolith.client.presentation.api.project.user_task_router import router as user_task_router
 
 router = APIRouter()
 
@@ -15,3 +16,4 @@ router.include_router(profile_router)
 router.include_router(project_router)
 router.include_router(sprint_router)
 router.include_router(task_router)
+router.include_router(user_task_router)
