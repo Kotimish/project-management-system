@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 from monolith.project.domain.interfaces.repositories.task_repository import ITaskRepository
 from monolith.project.infrastructure.models import Task as ORMTask
 from monolith.project.infrastructure.models import TaskStatus as ORMStatus
+from monolith.project.infrastructure.models import Participant as ORMParticipant
 from monolith.project.domain.model import Task, TaskView, TaskStatus
 
 
@@ -71,28 +72,47 @@ class TaskRepository(ITaskRepository):
             for orm_task in orm_tasks
         ]
 
-    async def get_list_tasks_by_assignee(self, assignee_id: int) -> list[Task]:
+    async def get_list_tasks_by_auth_user_id(self, auth_user_id: int) -> list[TaskView]:
         statement = (
             select(ORMTask)
-            .where(ORMTask.assignee_id==assignee_id)
+            .join(ORMTask.assignee)
+            .where(ORMParticipant.auth_user_id==auth_user_id)
+            .options(
+                # Добавление связанной модели статуса задачи
+                selectinload(ORMTask.status),
+                # Добавление связанного участника проекта
+                selectinload(ORMTask.assignee),
+            )
             .order_by(ORMTask.id)
         )
         result = await self.session.scalars(statement)
         orm_tasks = result.all()
-        return [
-            Task(
+
+        tasks = []
+        for orm_task in orm_tasks:
+            status = TaskStatus(
+                status_id=orm_task.status.id,
+                name=orm_task.status.name,
+                slug=orm_task.status.slug,
+                description=orm_task.status.description,
+                created_at=orm_task.status.created_at,
+                updated_at=orm_task.status.updated_at
+            )
+            task = TaskView(
                 task_id=orm_task.id,
                 title=orm_task.title,
                 description=orm_task.description,
                 project_id=orm_task.project_id,
                 status_id=orm_task.status_id,
+                status=status,
                 assignee_id=orm_task.assignee_id,
                 sprint_id=orm_task.sprint_id,
                 created_at=orm_task.created_at,
                 updated_at=orm_task.updated_at,
             )
-            for orm_task in orm_tasks
-        ]
+            tasks.append(task)
+
+        return tasks
 
     async def get_list_tasks_by_project(self, project_id: int) -> list[Task]:
         statement = (
@@ -120,7 +140,8 @@ class TaskRepository(ITaskRepository):
     async def get_list_tasks_by_sprint(self, sprint_id: int) -> list[TaskView]:
         statement = (
             select(ORMTask)
-            .options(selectinload(ORMTask.status))  # Подгружаем связанный ORMStatus
+            # Добавление связанной модели статуса задачи
+            .options(selectinload(ORMTask.status))
             .where(ORMTask.sprint_id==sprint_id)
         )
         result = await self.session.scalars(statement)

@@ -28,8 +28,8 @@ class ITaskRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list_tasks_by_assignee(self, assignee_id: int) -> list[Task]:
-        """Получить задачу по id ответственного"""
+    async def get_list_tasks_by_auth_user_id(self, auth_user_id: int) -> list[TaskView]:
+        """Получить задачу по внешнему id пользователя"""
         raise NotImplementedError
 
     @abstractmethod

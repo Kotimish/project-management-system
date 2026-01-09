@@ -53,21 +53,6 @@ class TaskService(ITaskService):
             sprint_id=task.sprint_id,
         )
 
-    async def get_list_tasks_by_assignee_id(self, assignee_id: int) -> list[dto.TaskDTO]:
-        tasks = await self.repository.get_list_tasks_by_assignee(assignee_id)
-        return [
-            dto.TaskDTO(
-                id=task.id,
-                title=task.title,
-                description=task.description,
-                project_id=task.project_id,
-                status_id=task.status_id,
-                assignee_id=task.assignee_id,
-                sprint_id=task.sprint_id,
-            )
-            for task in tasks
-        ]
-
     async def get_list_tasks_by_project(self, project_id: int) -> list[dto.TaskDTO]:
         tasks = await self.repository.get_list_tasks_by_project(project_id)
         return [

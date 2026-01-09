@@ -19,3 +19,8 @@ class IViewService(ABC):
     async def get_task_detail(self, project_id: int, sprint_id: int, task_id: int) -> views.TaskView:
         """Получение полной информации по задаче и связанным сущностям"""
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_tasks_by_auth_user_id(self, auth_user_id: int) -> views.TaskListView:
+        """Получение списка задач, связанных с определенным пользователем"""
+        raise NotImplementedError

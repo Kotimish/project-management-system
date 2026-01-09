@@ -36,7 +36,7 @@ class ViewService(IViewService):
         self.task_status_repository = task_status_repository
         self.participant_repository = participant_repository
 
-    async def _get_dto_tasks_with_status_by_sprint_id(self, sprint_id: int) -> list[views.TaskWithStatusDetail]:
+    async def _get_dto_tasks_with_status_by_sprint_id(self, sprint_id: int) -> list[views.TaskWithStatusReference]:
         tasks = await self.task_repository.get_list_tasks_by_sprint(sprint_id)
         dto_tasks = []
         for task in tasks:
@@ -47,7 +47,7 @@ class ViewService(IViewService):
                 name=task.status.name,
                 slug=task.status.slug
             )
-            dto_task = views.TaskWithStatusDetail(
+            dto_task = views.TaskWithStatusReference(
                 id=task.id,
                 title=task.title,
                 status=dto_status
@@ -180,3 +180,26 @@ class ViewService(IViewService):
             sprint=dto_sprint,
             task=dto_task
         )
+
+    async def get_tasks_by_auth_user_id(self, auth_user_id: int) -> views.TaskListView:
+        tasks = await self.task_repository.get_list_tasks_by_auth_user_id(auth_user_id)
+
+        dto_tasks = []
+        for task in tasks:
+            if task.status is None:
+                raise TaskStatusNotFoundError(f"Task with id \"{task.id}\" don't have status")
+            dto_status = views.TaskStatusReference(
+                id=task.status.id,
+                name=task.status.name,
+                slug=task.status.slug
+            )
+            dto_task = views.TaskWithStatusDetail(
+                id=task.id,
+                project_id=task.project_id,
+                sprint_id=task.sprint_id,
+                title=task.title,
+                status=dto_status
+            )
+            dto_tasks.append(dto_task)
+
+        return views.TaskListView(tasks=dto_tasks)

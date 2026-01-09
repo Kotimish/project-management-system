@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 from monolith.project.application.dto import task as task_dto
-from monolith.project.domain.model import Task
 from monolith.project.application.dto import task as dto
 
 
@@ -23,11 +22,6 @@ class ITaskService(ABC):
     @abstractmethod
     async def get_task_by_id(self, task_id: int) -> dto.TaskDTO:
         """Получить задачу по id"""
-        raise NotImplementedError
-
-    @abstractmethod
-    async def get_list_tasks_by_assignee_id(self, assignee_id: int) -> list[dto.TaskDTO]:
-        """Получить задачу по id ответственного"""
         raise NotImplementedError
 
     @abstractmethod
