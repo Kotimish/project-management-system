@@ -10,6 +10,18 @@ class UserProfileService(IUserProfileService):
     def __init__(self, user_profile_client: IApiClient):
         self.user_profile_client = user_profile_client
 
+    async def get_all_profiles(self) -> list[dto.UserProfileDTO]:
+        try:
+            raw_profiles = await self.user_profile_client.get(
+                f"/api/user_profile/",
+            )
+            return [
+                dto.UserProfileDTO.model_validate(raw_profile)
+                for raw_profile in raw_profiles
+            ]
+        except exceptions.HTTPStatusError:
+            return []
+
     async def create_profile(
             self,
             data: dto.CreateUserProfileCommand

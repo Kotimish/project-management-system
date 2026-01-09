@@ -1,13 +1,14 @@
 from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, Query
+from fastapi import APIRouter, Depends, Form
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 
 from monolith.client.application.dtos import user_profile as dto
+from monolith.client.application.exceptions import api_client_exception as exceptions
 from monolith.client.application.interfaces.services.project_service import IProjectService
 from monolith.client.application.interfaces.services.task_service import ITaskService
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
@@ -17,7 +18,6 @@ from monolith.client.presentation.api.project.dependencies import get_project_se
 from monolith.client.presentation.api.utils import render_message
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.config.settings import BASE_DIR
-from monolith.client.application.exceptions import api_client_exception as exceptions
 
 router = APIRouter(
     prefix="/profiles",
@@ -28,6 +28,37 @@ templates = Jinja2Templates(
     directory=BASE_DIR / "src" / "monolith" / "client" / "presentation" / "templates"
 )
 
+
+@router.get("/", response_class=HTMLResponse, include_in_schema=False)
+async def get_user_profiles(
+        request: Request,
+        profile_service: IUserProfileService = Depends(get_user_profile_service),
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
+):
+    """Страница профиля пользователя"""
+    if current_user is None:
+        return render_message(
+            request,
+            message="Вы не авторизованы в системе.",
+            back_url="/login",
+            button_text="Перейти на страницу входа"
+        )
+
+    profiles = await profile_service.get_all_profiles()
+
+    user_schema = schemas.GetUserProfileResponse(**current_user.model_dump())
+    breadcrumbs = profile_breadcrumbs.get_profiles_breadcrumbs()
+    context = {
+        "request": request,
+        "user": user_schema.model_dump(),
+        "profiles": profiles,
+        "page_title": "Профиль",
+        "breadcrumbs": breadcrumbs,
+    }
+    return templates.TemplateResponse(
+        "profile/profile_list.html",
+        context
+    )
 
 
 @router.get("/{user_id}/edit", response_class=HTMLResponse, include_in_schema=False)
@@ -130,7 +161,6 @@ async def get_user_profile(
         tasks = tasks_view.tasks if tasks_view else []
     except exceptions.HTTPStatusError:
         tasks = []
-
 
     user_schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = profile_breadcrumbs.get_profile_breadcrumbs(user_id)

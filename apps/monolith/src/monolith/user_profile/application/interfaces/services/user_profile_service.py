@@ -12,6 +12,11 @@ class IUserProfileService(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_all_profiles(self) -> list[dto.GetUserProfileResponse]:
+        """Получение профиля пользователя по id"""
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_profile_by_id(self, profile_id: int) -> dto.GetUserProfileResponse | None:
         """Получение профиля пользователя по id"""
         raise NotImplementedError
