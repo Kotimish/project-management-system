@@ -14,7 +14,7 @@ from monolith.client.application.interfaces.services.sprint_service import ISpri
 from monolith.client.presentation.api.dependencies import get_current_user
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_sprint_service, get_project_service
-from monolith.client.presentation.api.utils import render_message
+from monolith.client.presentation.api.utils import render_message, get_status_color
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.presentation.schemas import views
 from monolith.config.settings import BASE_DIR
@@ -311,6 +311,14 @@ async def get_sprint_by_id(
             button_text="Перейти на страницу списка спринтов"
         )
 
+    colored_tasks = [
+        {
+            **task.model_dump(),
+            'color': get_status_color(task.status.slug)
+        }
+        for task in sprint_view.tasks
+    ]
+
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_sprint_detail_breadcrumbs(
         views.ProjectReference(
@@ -328,7 +336,7 @@ async def get_sprint_by_id(
         "page_title": "Спринт",
         "sprint": sprint_view.sprint,
         "project": sprint_view.project,
-        "tasks": sprint_view.tasks,
+        "tasks": colored_tasks,
         "breadcrumbs": breadcrumbs,
         "errors": None,
     }

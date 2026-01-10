@@ -19,7 +19,7 @@ from monolith.client.presentation.api.dependencies import get_current_user, get_
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_task_service, get_sprint_service, \
     get_task_status_service
-from monolith.client.presentation.api.utils import render_message
+from monolith.client.presentation.api.utils import render_message, get_status_color
 from monolith.client.presentation.schemas import user_profile as profile_schemas
 from monolith.client.presentation.schemas import views
 from monolith.client.presentation.schemas.task import CreateTaskSchema, UpdateTaskSchema
@@ -321,6 +321,10 @@ async def get_task_by_id(
     else:
         profile = None
 
+    colored_task = {
+        **task_view.task.model_dump(),
+        'color': get_status_color(task_view.task.status.slug)
+    }
     user_schema = profile_schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_task_detail_breadcrumbs(
         views.ProjectReference(
@@ -342,7 +346,7 @@ async def get_task_by_id(
         "page_title": "Задача",
         "project": task_view.project,
         "sprint": task_view.sprint,
-        "task": task_view.task,
+        "task": colored_task,
         "profile": profile,
         "breadcrumbs": breadcrumbs,
         "errors": None,

@@ -8,7 +8,7 @@ from monolith.client.application.interfaces.services.task_service import ITaskSe
 from monolith.client.presentation.api.dependencies import get_current_user
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_task_service
-from monolith.client.presentation.api.utils import render_message
+from monolith.client.presentation.api.utils import render_message, get_status_color
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.presentation.schemas import views
 from monolith.config.settings import BASE_DIR
@@ -40,12 +40,19 @@ async def get_tasks(
     raw_task_view = await service.get_tasks_by_auth_user_id(auth_user_id)
     task_view = views.TaskListView.model_validate(raw_task_view.model_dump())
 
+    colored_tasks = [
+        {
+            **task.model_dump(),
+            'color': get_status_color(task.status.slug)
+        }
+        for task in task_view.tasks
+    ]
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_tasks_by_user_breadcrumbs()
     context = {
         "request": request,
         "user": schema.model_dump(),
-        "tasks": task_view.tasks,
+        "tasks": colored_tasks,
         "breadcrumbs": breadcrumbs,
         "errors": None,
     }

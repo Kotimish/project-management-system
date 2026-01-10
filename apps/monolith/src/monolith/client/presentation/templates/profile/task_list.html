@@ -12,7 +12,11 @@
     {% for task in tasks %}
     <tr>
         <td>{{task.title or "Без названия"}}</td>
-        <td>{{task.status.name}}</td>
+        <td>
+            <span class="badge {{ task.color }}">
+                {{task.status.name}}
+            </span>
+        </td>
         <td>
             <a href="/projects/{{task.project_id}}/sprints/{{task.sprint_id}}/tasks/{{task.id}}"
                class="btn btn-sm btn-outline-secondary me-2"

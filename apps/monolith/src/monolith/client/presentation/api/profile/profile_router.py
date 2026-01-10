@@ -15,7 +15,7 @@ from monolith.client.application.interfaces.services.user_profile_service import
 from monolith.client.presentation.api.dependencies import get_current_user, get_user_profile_service
 from monolith.client.presentation.api.profile import breadcrumbs as profile_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_project_service, get_task_service
-from monolith.client.presentation.api.utils import render_message
+from monolith.client.presentation.api.utils import render_message, get_status_color
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.presentation.schemas.user_profile import UpdateUserProfileRequest
 from monolith.config.settings import BASE_DIR
@@ -148,6 +148,14 @@ async def get_user_profile(
     except exceptions.HTTPStatusError:
         tasks = []
 
+    colored_tasks = [
+        {
+            **task.model_dump(),
+            'color': get_status_color(task.status.slug)
+        }
+        for task in tasks
+    ]
+
     user_schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = profile_breadcrumbs.get_profile_breadcrumbs(user_id)
     context = {
@@ -155,7 +163,7 @@ async def get_user_profile(
         "user": user_schema.model_dump(),
         "profile": profile_schema.model_dump(),
         "projects": projects,
-        "tasks": tasks,
+        "tasks": colored_tasks,
         "page_title": "Профиль",
         "breadcrumbs": breadcrumbs,
     }
