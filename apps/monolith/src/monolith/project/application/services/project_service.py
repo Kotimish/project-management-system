@@ -4,10 +4,11 @@ from monolith.project.application.dto.project import UpdateProjectCommand
 from monolith.project.application.interfaces.factories.project_factory import IProjectFactory
 from monolith.project.application.interfaces.services.participant_service import IParticipantService
 from monolith.project.application.interfaces.services.project_service import IProjectService
+from monolith.project.application.interfaces.services.sprint_service import ISprintService
 from monolith.project.application.interfaces.services.task_service import ITaskService
 from monolith.project.domain.exceptions import participant_exception
+from monolith.project.domain.exceptions import project_exception
 from monolith.project.domain.interfaces.repositories.project_repository import IProjectRepository
-from monolith.project.domain.model import Participant
 
 
 class ProjectService(IProjectService):
@@ -19,11 +20,13 @@ class ProjectService(IProjectService):
             repository: IProjectRepository,
             participant_service: IParticipantService,
             task_service: ITaskService,
+            sprint_service: ISprintService
     ):
         self.factory = factory
         self.repository = repository
         self.participant_service = participant_service
         self.task_service = task_service
+        self.sprint_service = sprint_service
 
     async def create_project(self, name: str, owner_id: int, description: str = None) -> project_dto.ProjectDTO:
         project = self.factory.create(name, owner_id, description)
@@ -85,17 +88,29 @@ class ProjectService(IProjectService):
             updated_at=project.updated_at,
         )
 
-    async def delete_project(self, project_id: int) -> bool:
+    async def delete_project(self, project_id: int) -> None:
         # TODO требуется проверка на владельца проекта
-        return await self.repository.remove(project_id)
+        sprints = await self.sprint_service.get_all_sprint_by_project_id(project_id)
+        if len(sprints) > 0:
+            raise project_exception.ProjectCannotBeDeletedException(
+                "Project has sprints"
+            )
+        participants = await self.participant_service.get_participants_by_project(project_id)
+        for participant in participants:
+            await self.remove_participant_from_project(project_id, participant.auth_user_id)
+        status = await self.repository.remove(project_id)
+        if not status:
+            raise project_exception.ProjectNotFoundError(
+                "Project not found"
+            )
 
     async def add_participant_to_project(self, project_id: int, user_id: int) -> participant_dto.ParticipantDTO:
         # TODO требуется проверка на владельца проекта
         return await self.participant_service.add_participant(project_id, user_id)
 
-    async def remove_participant_from_project(self, project_id: int, user_id: int):
+    async def remove_participant_from_project(self, project_id: int, user_id: int) -> None:
         # TODO требуется проверка на владельца проекта
-        tasks = await self.task_service.get_tasks_by_auth_user_id(user_id)
+        tasks = await self.task_service.get_tasks_by_auth_user_in_project(project_id, user_id)
         if len(tasks) > 0:
             raise participant_exception.ParticipantCannotBeDeletedException(
                 "Participant has tasks in the project"

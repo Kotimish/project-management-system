@@ -1,6 +1,7 @@
 from monolith.client.application.dtos import project as dto
 from monolith.client.application.dtos import views as views
-from monolith.client.application.exceptions import api_client_exception as exceptions
+from monolith.client.application.exceptions import api_client_exception as api_exceptions
+from monolith.client.application.exceptions import project_exception as exceptions
 from monolith.client.application.interfaces.client import IApiClient
 from monolith.client.application.interfaces.services.project_service import IProjectService
 
@@ -18,7 +19,7 @@ class ProjectService(IProjectService):
             )
             project = views.ProjectView.model_validate(raw_project)
             return project
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return None
 
     async def get_projects_by_user_id(self, user_id: int) -> list[dto.ProjectDTO]:
@@ -31,7 +32,7 @@ class ProjectService(IProjectService):
                 for raw_project in raw_projects
             ]
             return projects
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return []
 
     async def create_project(self, data: dto.CreateProjectDTO) -> dto.ProjectDTO | None:
@@ -42,7 +43,7 @@ class ProjectService(IProjectService):
             )
             project = dto.ProjectDTO.model_validate(raw_project)
             return project
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return None
 
     async def update_project(self, project_id: int, data: dto.UpdateProjectDTO) -> dto.ProjectDTO | None:
@@ -53,5 +54,20 @@ class ProjectService(IProjectService):
             )
             project = dto.ProjectDTO.model_validate(raw_project)
             return project
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return None
+
+    async def delete_project(self, project_id: int) -> None:
+        try:
+            await self.project_client.delete(
+                f"/api/projects/{project_id}",
+            )
+        except api_exceptions.HTTPStatusError as exception:
+            if exception.status_code == 409:
+                raise exceptions.ProjectCannotBeDeletedException(
+                    "Project has sprints"
+                )
+            if exception.status_code == 404:
+                raise exceptions.ProjectNotFoundError(
+                    "Project not found"
+                )

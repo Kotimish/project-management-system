@@ -36,9 +36,13 @@ class ITaskService(ABC):
 
     @abstractmethod
     async def get_tasks_by_auth_user_id(self, auth_user_id: int) -> list[dto.TaskDTO]:
-        """Получить задачу по id спринта"""
+        """Получить задачу по id пользователя"""
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_tasks_by_auth_user_in_project(self, project_id: int, auth_user_id: int) -> list[dto.TaskDTO]:
+        """Получить задачу по id пользователя и id проекта"""
+        raise NotImplementedError
 
     @abstractmethod
     async def delete_task(self, task_id: int) -> bool:

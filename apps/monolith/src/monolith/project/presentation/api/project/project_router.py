@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 
+from monolith.client.presentation.schemas import views as views
 from monolith.project.application.dto.project import UpdateProjectCommand
 from monolith.project.application.interfaces.services.project_service import IProjectService
 from monolith.project.application.interfaces.services.view_service import IViewService
+from monolith.project.domain.exceptions import project_exception as exceptions
 from monolith.project.presentation.api.dependencies import get_view_service
 from monolith.project.presentation.api.project.dependencies import get_project_service
 from monolith.project.presentation.schemas.project import ProjectSchema, CreateProjectSchema, UpdateProjectSchema
-from monolith.client.presentation.schemas import views as views
 
 router = APIRouter(
     prefix="/projects",
@@ -27,6 +28,7 @@ async def search_projects(
         ProjectSchema(**project.model_dump())
         for project in projects
     ]
+
 
 @router.post("/")
 async def create_project(
@@ -65,3 +67,16 @@ async def update_project(
         command
     )
     return ProjectSchema(**project.model_dump())
+
+
+@router.delete("/{project_id}")
+async def delete_project(
+        project_id: int,
+        project_service: IProjectService = Depends(get_project_service)
+):
+    try:
+        await project_service.delete_project(project_id)
+    except exceptions.ProjectCannotBeDeletedException as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except exceptions.ProjectNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))

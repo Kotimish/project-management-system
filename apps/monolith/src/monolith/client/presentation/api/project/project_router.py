@@ -8,6 +8,8 @@ from starlette.responses import RedirectResponse
 
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.application.dtos.project import CreateProjectDTO, UpdateProjectDTO
+from monolith.client.application.exceptions import api_client_exception as api_exceptions
+from monolith.client.application.exceptions import project_exception as exceptions
 from monolith.client.application.interfaces.services.project_service import IProjectService
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
 from monolith.client.presentation.api.dependencies import get_current_user, get_user_profile_service
@@ -229,6 +231,55 @@ async def update_project(
         url=f"/projects/{project_id}",
         status_code=303
     )
+
+
+@router.post("/{project_id}/delete", response_class=HTMLResponse, include_in_schema=False)
+async def delete_project(
+        request: Request,
+        project_id: int,
+        project_service: IProjectService = Depends(get_project_service),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
+):
+    """Запрос на удаление проекта"""
+    if current_user is None:
+        return render_message(
+            request,
+            message="Вы не авторизованы в системе.",
+            back_url="/login",
+            button_text="Перейти на страницу входа"
+        )
+    schema = schemas.GetUserProfileResponse(**current_user.model_dump())
+    back_url = f"/projects/{project_id}"
+    try:
+        await project_service.delete_project(project_id)
+        return RedirectResponse(url="/projects", status_code=303)
+    except exceptions.ProjectCannotBeDeletedException:
+        return render_message(
+            request=request,
+            message="Невозможно удалить проект: есть активные спринты.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к проекту",
+            current_user=schema.model_dump()
+        )
+    except exceptions.ProjectNotFoundError:
+        return render_message(
+            request=request,
+            message="Проект не найден в системе.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к проекту",
+            current_user=schema.model_dump()
+        )
+    except api_exceptions.HTTPStatusError as e:
+        return render_message(
+            request=request,
+            message="Произошла ошибка при удалении проекта.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к проекту",
+            current_user=schema.model_dump()
+        )
 
 
 @router.get("/{project_id}", response_class=HTMLResponse, include_in_schema=False)

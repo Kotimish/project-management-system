@@ -15,3 +15,7 @@ class InvalidProjectOwnerIdException(ProjectException):
 
 class ProjectNotFoundError(ProjectException):
     """Исключение для несуществующего Проекта"""
+
+
+class ProjectCannotBeDeletedException(ProjectException):
+    """Исключение при невозможности удалить проект из-за связанных сущностей"""

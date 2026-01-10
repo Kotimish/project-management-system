@@ -3,10 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from monolith.project.domain.interfaces.repositories.task_repository import ITaskRepository
-from monolith.project.infrastructure.models import Task as ORMTask
-from monolith.project.infrastructure.models import TaskStatus as ORMStatus
-from monolith.project.infrastructure.models import Participant as ORMParticipant
 from monolith.project.domain.model import Task, TaskView, TaskStatus
+from monolith.project.infrastructure.models import Participant as ORMParticipant
+from monolith.project.infrastructure.models import Task as ORMTask
 
 
 class TaskRepository(ITaskRepository):
@@ -17,12 +16,12 @@ class TaskRepository(ITaskRepository):
 
     async def add(self, task: Task) -> Task:
         orm_task = ORMTask(
-            title = task.title,
-            description = task.description,
-            project_id = task.project_id,
-            status_id = task.status_id,
-            assignee_id = task.assignee_id,
-            sprint_id = task.sprint_id,
+            title=task.title,
+            description=task.description,
+            project_id=task.project_id,
+            status_id=task.status_id,
+            assignee_id=task.assignee_id,
+            sprint_id=task.sprint_id,
 
         )
         self.session.add(orm_task)
@@ -42,15 +41,15 @@ class TaskRepository(ITaskRepository):
         if not orm_task:
             return None
         return Task(
-            task_id = orm_task.id,
-            title = orm_task.title,
-            description = orm_task.description,
-            project_id = orm_task.project_id,
-            status_id = orm_task.status_id,
-            assignee_id = orm_task.assignee_id,
-            sprint_id = orm_task.sprint_id,
-            created_at = orm_task.created_at,
-            updated_at = orm_task.updated_at,
+            task_id=orm_task.id,
+            title=orm_task.title,
+            description=orm_task.description,
+            project_id=orm_task.project_id,
+            status_id=orm_task.status_id,
+            assignee_id=orm_task.assignee_id,
+            sprint_id=orm_task.sprint_id,
+            created_at=orm_task.created_at,
+            updated_at=orm_task.updated_at,
         )
 
     async def get_all(self) -> list[Task]:
@@ -76,7 +75,7 @@ class TaskRepository(ITaskRepository):
         statement = (
             select(ORMTask)
             .join(ORMTask.assignee)
-            .where(ORMParticipant.auth_user_id==auth_user_id)
+            .where(ORMParticipant.auth_user_id == auth_user_id)
             .options(
                 # Добавление связанной модели статуса задачи
                 selectinload(ORMTask.status),
@@ -117,7 +116,34 @@ class TaskRepository(ITaskRepository):
     async def get_list_tasks_by_project(self, project_id: int) -> list[Task]:
         statement = (
             select(ORMTask)
-            .where(ORMTask.project_id==project_id)
+            .where(ORMTask.project_id == project_id)
+            .order_by(ORMTask.id)
+        )
+        result = await self.session.scalars(statement)
+        orm_tasks = result.all()
+        return [
+            Task(
+                task_id=orm_task.id,
+                title=orm_task.title,
+                description=orm_task.description,
+                project_id=orm_task.project_id,
+                status_id=orm_task.status_id,
+                assignee_id=orm_task.assignee_id,
+                sprint_id=orm_task.sprint_id,
+                created_at=orm_task.created_at,
+                updated_at=orm_task.updated_at,
+            )
+            for orm_task in orm_tasks
+        ]
+
+    async def get_list_tasks_by_auth_user_id_in_project(self, project_id: int, auth_user_id: int) -> list[Task]:
+        statement = (
+            select(ORMTask)
+            .join(ORMTask.assignee)
+            .where(
+                ORMTask.project_id == project_id,
+                ORMParticipant.auth_user_id == auth_user_id
+            )
             .order_by(ORMTask.id)
         )
         result = await self.session.scalars(statement)
@@ -142,7 +168,7 @@ class TaskRepository(ITaskRepository):
             select(ORMTask)
             # Добавление связанной модели статуса задачи
             .options(selectinload(ORMTask.status))
-            .where(ORMTask.sprint_id==sprint_id)
+            .where(ORMTask.sprint_id == sprint_id)
         )
         result = await self.session.scalars(statement)
         orm_tasks = result.all()
