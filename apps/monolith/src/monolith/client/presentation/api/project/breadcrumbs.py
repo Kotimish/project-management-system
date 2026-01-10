@@ -44,6 +44,19 @@ def get_project_detail_breadcrumbs(project: views.ProjectReference, is_active: b
     return base
 
 
+def get_project_edit_participants_breadcrumbs(project: views.ProjectReference, is_active: bool = True) -> list[Breadcrumb]:
+    """Возвращает Навигационную цепочку для страницы редактирования участников проекта"""
+    base = get_project_detail_breadcrumbs(project, False)
+    base.append(
+        Breadcrumb(
+            name="Управление командой",
+            url=f"/projects/{project.id}/participants/edit",
+            is_active=is_active
+        )
+    )
+    return base
+
+
 def get_project_edit_breadcrumbs(project: views.ProjectReference, is_active: bool = True) -> list[Breadcrumb]:
     """Возвращает Навигационную цепочку для редактирования страницы проекта"""
     base = get_project_detail_breadcrumbs(project, False)

@@ -9,7 +9,8 @@ from starlette.responses import RedirectResponse
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.application.dtos.project import CreateProjectDTO, UpdateProjectDTO
 from monolith.client.application.interfaces.services.project_service import IProjectService
-from monolith.client.presentation.api.dependencies import get_current_user
+from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
+from monolith.client.presentation.api.dependencies import get_current_user, get_user_profile_service
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_project_service
 from monolith.client.presentation.api.utils import render_message
@@ -235,6 +236,7 @@ async def get_project_by_id(
         request: Request,
         project_id: int,
         project_service: IProjectService = Depends(get_project_service),
+        profile_service: IUserProfileService = Depends(get_user_profile_service),
         current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница проекта"""
@@ -263,6 +265,11 @@ async def get_project_by_id(
             back_url="/projects",
             button_text="Перейти на страницу списка проектов"
         )
+    if project_view and project_view.project:
+        owner = await profile_service.get_profile_by_auth_user_id(project_view.project.owner_id)
+    else:
+        owner = None
+    participants = await profile_service.get_profiles_by_auth_user_ids(project_view.participant_ids)
 
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     breadcrumbs = project_breadcrumbs.get_project_detail_breadcrumbs(
@@ -277,6 +284,8 @@ async def get_project_by_id(
         "page_title": "Проект",
         "project": project_view.project,
         "sprints": project_view.sprints,
+        "participants": participants,
+        "owner": owner,
         "breadcrumbs": breadcrumbs,
     }
     return templates.TemplateResponse(

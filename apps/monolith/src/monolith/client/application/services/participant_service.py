@@ -1,7 +1,8 @@
 from monolith.client.application.dtos import participant as dto
 from monolith.client.application.interfaces.client import IApiClient
 from monolith.client.application.interfaces.services.participant_service import IParticipantService
-from monolith.client.application.exceptions import api_client_exception as exceptions
+from monolith.client.application.exceptions import api_client_exception as api_exceptions
+from monolith.client.application.exceptions import participant_exception as exceptions
 
 
 class ParticipantService(IParticipantService):
@@ -20,5 +21,30 @@ class ParticipantService(IParticipantService):
                 for raw_participant in raw_participants
             ]
             return participants
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return []
+
+
+    async def add_participant_to_project(self, project_id: int, user_id: int) -> dto.ParticipantDTO | None:
+        try:
+            raw_participant = await self.project_client.post(
+                f"/api/projects/{project_id}/participants/{user_id}",
+            )
+            return dto.ParticipantDTO.model_validate(raw_participant)
+        except api_exceptions.HTTPStatusError:
+            return None
+
+    async def remove_participant_from_project(self, project_id: int, user_id: int) -> None:
+        try:
+            await self.project_client.delete(
+                f"/api/projects/{project_id}/participants/{user_id}",
+            )
+        except api_exceptions.HTTPStatusError as exception:
+            if exception.status_code == 409:
+                raise exceptions.ParticipantCannotBeDeletedException(
+                    "Participant has tasks in the project"
+                )
+            if exception.status_code == 404:
+                raise exceptions.ParticipantNotFoundError(
+                    "Participant not found in the project"
+                )

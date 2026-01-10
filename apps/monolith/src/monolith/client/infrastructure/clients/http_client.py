@@ -63,3 +63,19 @@ class HttpxApiClient(IApiClient):
                 message=str(e),
             )
         return response.json()
+
+    async def delete(self, endpoint: str, headers: dict = None) -> dict:
+        try:
+            response = await self._client.delete(endpoint, headers=headers)
+        except httpx.RequestError as e:
+            raise exceptions.RequestError(
+                message=str(e),
+            )
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            raise exceptions.HTTPStatusError(
+                status_code=response.status_code,
+                message=str(e),
+            )
+        return response.json()
