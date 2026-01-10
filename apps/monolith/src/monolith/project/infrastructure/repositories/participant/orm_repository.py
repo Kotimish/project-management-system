@@ -86,12 +86,23 @@ class ParticipantRepository(IParticipantRepository):
 
     async def remove_by_auth_user_and_project(self, auth_user_id: int, project_id: int) -> bool:
         statement = (
-            delete(ORMParticipant).
+            select(ORMParticipant).
             where(
                 ORMParticipant.auth_user_id == auth_user_id,
                 ORMParticipant.project_id == project_id
             )
         )
         result = await self.session.execute(statement)
+        participant = result.scalar_one_or_none()
+
+        if participant is None:
+            return False
+
+        statement = (
+            delete(ORMParticipant)
+            .where(ORMParticipant.id == participant.id)
+        )
+        await self.session.execute(statement)
         await self.session.commit()
+
         return True

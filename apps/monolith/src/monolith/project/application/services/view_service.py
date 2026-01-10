@@ -68,6 +68,12 @@ class ViewService(IViewService):
         project = await self.project_repository.get_by_id(project_id)
         if project is None:
             raise ProjectNotFoundError(f"Project with id \"{project_id}\" not found")
+        participants = await self.participant_repository.get_all_by_project_id(project_id)
+        participant_ids = [
+            participant.auth_user_id
+            for participant in participants
+        ]
+
         sprints = await self.sprint_repository.get_all_by_project_id(project_id)
         dto_sprints = []
         for sprint in sprints:
@@ -95,6 +101,7 @@ class ViewService(IViewService):
             updated_at=project.updated_at
         )
         return views.ProjectView(
+            participant_ids=participant_ids,
             project=dto_project,
             sprints=dto_sprints
         )

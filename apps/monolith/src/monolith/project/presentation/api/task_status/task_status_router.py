@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from monolith.project.application.interfaces.services.task_status_service import ITaskStatusService
-from monolith.project.presentation.api.dependencies import get_task_status_service
+from monolith.project.presentation.api.task_status.dependencies import get_task_status_service
 from monolith.project.presentation.schemas.task_status import TaskStatusResponse
 
 router = APIRouter(

@@ -8,7 +8,7 @@ class IParticipantService(ABC):
     """Интерфейс сервиса участников проекта"""
 
     @abstractmethod
-    async def add_participant(self, project_id: int, user_id: int) -> Participant:
+    async def add_participant(self, project_id: int, user_id: int) -> dto.ParticipantDTO:
         """Добавить участника в проект"""
         raise NotImplementedError
 
@@ -18,6 +18,6 @@ class IParticipantService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def remove_participant(self, project_id: int, user_id: int) -> bool:
+    async def remove_participant(self, project_id: int, user_id: int):
         """Убрать участника из проекта"""
         raise NotImplementedError

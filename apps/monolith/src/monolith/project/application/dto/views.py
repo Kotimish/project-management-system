@@ -102,6 +102,7 @@ class ProjectReference(BaseModel):
 
 class ProjectView(BaseModel):
     """Агрегат данные для отображения информации о проекте"""
+    participant_ids: list[int]
     project: ProjectDetail
     sprints: list[SprintWithTaskDetail]
 

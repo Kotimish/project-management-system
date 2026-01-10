@@ -83,6 +83,21 @@ class TaskService(ITaskService):
             for task in tasks
         ]
 
+    async def get_tasks_by_auth_user_id(self, auth_user_id: int) -> list[dto.TaskDTO]:
+        tasks = await self.repository.get_list_tasks_by_auth_user_id(auth_user_id)
+        return [
+            dto.TaskDTO(
+                id=task.id,
+                title=task.title,
+                description=task.description,
+                project_id=task.project_id,
+                status_id=task.status_id,
+                assignee_id=task.assignee_id,
+                sprint_id=task.sprint_id,
+            )
+            for task in tasks
+        ]
+
     async def delete_task(self, task_id: int) -> bool:
         return await self.repository.remove(task_id)
 

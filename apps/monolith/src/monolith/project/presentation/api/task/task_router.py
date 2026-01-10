@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends
 
 from monolith.project.application.interfaces.services.task_service import ITaskService
 from monolith.project.application.interfaces.services.view_service import IViewService
-from monolith.project.presentation.api.dependencies import get_task_service, get_view_service
+from monolith.project.presentation.api.dependencies import get_view_service
+from monolith.project.presentation.api.task.dependencies import get_task_service
 from monolith.project.presentation.schemas.task import CreateTaskRequest, TaskResponse, UpdateTaskRequest
 from monolith.project.presentation.schemas.views import TaskView
 from monolith.project.application.dto import task as task_dto

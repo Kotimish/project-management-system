@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, Query
 from monolith.project.application.dto.sprint import UpdateSprintCommand
 from monolith.project.application.interfaces.services.sprint_service import ISprintService
 from monolith.project.application.interfaces.services.view_service import IViewService
-from monolith.project.presentation.api.dependencies import get_sprint_service, get_view_service
+from monolith.project.presentation.api.dependencies import get_view_service
+from monolith.project.presentation.api.sprint.dependencies import get_sprint_service
 from monolith.project.presentation.schemas.sprint import CreateSprintRequest, SprintResponse, UpdateSprintRequest
 from monolith.project.presentation.schemas.views import SprintView
 

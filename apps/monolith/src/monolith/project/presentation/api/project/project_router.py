@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, Query
 from monolith.project.application.dto.project import UpdateProjectCommand
 from monolith.project.application.interfaces.services.project_service import IProjectService
 from monolith.project.application.interfaces.services.view_service import IViewService
-from monolith.project.presentation.api.dependencies import get_project_service, get_view_service
+from monolith.project.presentation.api.dependencies import get_view_service
+from monolith.project.presentation.api.project.dependencies import get_project_service
 from monolith.project.presentation.schemas.project import ProjectSchema, CreateProjectSchema, UpdateProjectSchema
 from monolith.client.presentation.schemas import views as views
 
@@ -22,7 +23,6 @@ async def search_projects(
     if user_id is not None:
         projects = await service.get_list_projects_with_user(user_id)
 
-    # Преобразование в DTO
     return [
         ProjectSchema(**project.model_dump())
         for project in projects

@@ -15,3 +15,7 @@ class InvalidProjectProjectIdException(BaseProjectException):
 
 class ParticipantNotFoundError(ParticipantException):
     """Исключение для несуществующего Участника проекта"""
+
+
+class ParticipantCannotBeDeletedException(ParticipantException):
+    """Исключение при невозможности удалить Участника проекта из-за связанных сущностей"""

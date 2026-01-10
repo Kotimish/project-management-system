@@ -35,6 +35,12 @@ class ITaskService(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_tasks_by_auth_user_id(self, auth_user_id: int) -> list[dto.TaskDTO]:
+        """Получить задачу по id спринта"""
+        raise NotImplementedError
+
+
+    @abstractmethod
     async def delete_task(self, task_id: int) -> bool:
         """Удалить задачу по id"""
         raise NotImplementedError
