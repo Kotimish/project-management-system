@@ -26,3 +26,9 @@ class ISprintService(ABC):
     async def update_sprint(self, project_id: int, sprint_id: int, data: dto.UpdateSprintCommand) -> dto.SprintDTO | None:
         """Обновить данные спринта"""
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete_sprint(self, project_id: int, sprint_id: int) -> None:
+        """Удалить спринт"""
+        raise NotImplementedError
+

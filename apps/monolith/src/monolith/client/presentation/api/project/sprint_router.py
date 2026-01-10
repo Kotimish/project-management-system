@@ -9,6 +9,8 @@ from starlette.responses import RedirectResponse
 
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.application.dtos.sprint import CreateSprintCommand, UpdateSprintCommand
+from monolith.client.application.exceptions import api_client_exception as api_exceptions
+from monolith.client.application.exceptions import sprint_exception as exceptions
 from monolith.client.application.interfaces.services.project_service import IProjectService
 from monolith.client.application.interfaces.services.sprint_service import ISprintService
 from monolith.client.presentation.api.dependencies import get_current_user
@@ -275,6 +277,56 @@ async def update_sprint(
         url=f"/projects/{project_id}/sprints/{sprint_id}",
         status_code=303
     )
+
+
+@router.post("/{sprint_id}/delete", response_class=HTMLResponse, include_in_schema=False)
+async def update_sprint(
+        request: Request,
+        project_id: int,
+        sprint_id: int,
+        sprint_service: ISprintService = Depends(get_sprint_service),
+        current_user: dto.UserProfileDTO = Depends(get_current_user),
+):
+    """Запрос на удаление спринта"""
+    if current_user is None:
+        return render_message(
+            request,
+            message="Вы не авторизованы в системе.",
+            back_url="/login",
+            button_text="Перейти на страницу входа"
+        )
+    schema = schemas.GetUserProfileResponse(**current_user.model_dump())
+    back_url = f"/projects/{project_id}/sprints/{sprint_id}/"
+    try:
+        await sprint_service.delete_sprint(project_id, sprint_id)
+        return RedirectResponse(url=f"/projects/{project_id}", status_code=303)
+    except exceptions.SprintCannotBeDeletedException:
+        return render_message(
+            request=request,
+            message="Невозможно удалить спринт: есть активные задачи.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к спринту",
+            current_user=schema.model_dump()
+        )
+    except exceptions.SprintNotFoundError:
+        return render_message(
+            request=request,
+            message="Спринт не найден в проекте.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к спринту",
+            current_user=schema.model_dump()
+        )
+    except api_exceptions.HTTPStatusError as e:
+        return render_message(
+            request=request,
+            message="Произошла ошибка при удалении спринта.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к спринту",
+            current_user=schema.model_dump()
+        )
 
 
 @router.get("/{sprint_id}", response_class=HTMLResponse, include_in_schema=False)

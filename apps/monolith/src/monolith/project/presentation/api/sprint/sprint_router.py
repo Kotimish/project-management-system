@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException
 
 from monolith.project.application.dto.sprint import UpdateSprintCommand
 from monolith.project.application.interfaces.services.sprint_service import ISprintService
 from monolith.project.application.interfaces.services.view_service import IViewService
+from monolith.project.domain.exceptions import sprint_exception as exceptions
 from monolith.project.presentation.api.dependencies import get_view_service
 from monolith.project.presentation.api.sprint.dependencies import get_sprint_service
 from monolith.project.presentation.schemas.sprint import CreateSprintRequest, SprintResponse, UpdateSprintRequest
@@ -69,3 +70,17 @@ async def update_sprint(
     )
     sprint = await service.update_sprint(project_id, sprint_id, command)
     return SprintResponse(**sprint.model_dump())
+
+
+@router.delete("/{sprint_id}")
+async def delete_sprint(
+        project_id: int,
+        sprint_id: int,
+        sprint_service: ISprintService = Depends(get_sprint_service)
+):
+    try:
+        await sprint_service.delete_sprint(project_id, sprint_id)
+    except exceptions.SprintCannotBeDeletedException as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except exceptions.SprintNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))

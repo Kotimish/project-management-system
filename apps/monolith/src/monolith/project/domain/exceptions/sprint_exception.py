@@ -24,3 +24,6 @@ class SprintNotFoundError(SprintException):
 class SprintUnauthorizedError(SprintException):
     """Исключение при попытке получения доступа к Спринту без соответствующих прав"""
 
+
+class SprintCannotBeDeletedException(SprintException):
+    """Исключение при невозможности удалить спринт из-за связанных сущностей"""
