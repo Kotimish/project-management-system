@@ -12,10 +12,10 @@ from monolith.client.application.exceptions import api_client_exception as excep
 from monolith.client.application.interfaces.services.project_service import IProjectService
 from monolith.client.application.interfaces.services.task_service import ITaskService
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
-from monolith.client.presentation.api.dependencies import get_current_user, get_user_profile_service
+from monolith.client.presentation.api.dependencies import get_user_profile_service
 from monolith.client.presentation.api.profile import breadcrumbs as profile_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_project_service, get_task_service
-from monolith.client.presentation.api.utils import render_message, get_status_color
+from monolith.client.presentation.api.utils import render_message, get_status_color, get_current_user
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.presentation.schemas.user_profile import UpdateUserProfileRequest
 from monolith.config.settings import BASE_DIR

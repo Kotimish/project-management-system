@@ -1,7 +1,3 @@
-from fastapi import Depends
-from fastapi.requests import Request
-
-from monolith.client.application.dtos import user_profile as dto
 from monolith.client.application.interfaces.client import IApiClient
 from monolith.client.application.interfaces.services.auth_service import IAuthService
 from monolith.client.application.interfaces.services.client_service import IClientService
@@ -54,21 +50,3 @@ def get_participant_with_profile_service() -> IProjectTeamService:
         participant_service=participant_service,
         profile_service=profile_service,
     )
-
-
-async def get_current_user(
-        request: Request,
-        client_service: IClientService = Depends(get_client_service)
-) -> dto.UserProfileDTO | None:
-    """
-    Возвращает информацию о текущем пользователе из токена.
-    При необходимости обновляет токен.
-    """
-    access_token = request.cookies.get("access_token")
-    if not access_token:
-        return None
-    user = await client_service.get_current_user(access_token)
-    if not user:
-        # TODO в случае отсутствия пользователя в access token обновить его через refresh token
-        return None
-    return user

@@ -10,12 +10,13 @@ from pydantic import SecretStr
 from monolith.client.application.dtos.user import CreateUserCommand, LoginUserCommand
 from monolith.client.application.interfaces.services.client_service import IClientService
 from monolith.client.presentation.api.auth import breadcrumbs as auth_breadcrumbs
-from monolith.client.presentation.api.dependencies import get_client_service, get_current_user
-from monolith.client.presentation.api.utils import render_message
+from monolith.client.presentation.api.dependencies import get_client_service
+from monolith.client.presentation.api.utils import render_message, get_current_user
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.presentation.schemas.breadcrumb import Breadcrumb
 from monolith.config.settings import BASE_DIR, settings, Environment
+from monolith.client.application.exceptions import auth_exception as exceptions
 
 router = APIRouter(
     tags=["Client auth pages"]
@@ -71,6 +72,23 @@ async def post_register(
     )
     try:
         await service.register(user)
+    except exceptions.InvalidAuthLoginException:
+        return render_message(
+            request,
+            message=(
+                "Некорректный формат логина. "
+                "Логин должен быть без пробелов и спецсимволов."
+            ),
+            back_url="/register",
+            button_text="Вернуться на страницу регистрации",
+        )
+    except exceptions.InvalidAuthEmailException:
+        return render_message(
+            request,
+            message="Некорректный формат email.",
+            back_url="/register",
+            button_text="Вернуться на страницу регистрации",
+        )
     except Exception as e:
         return render_message(
             request,
@@ -126,7 +144,13 @@ async def post_login(
             password=SecretStr(password)
         )
         tokens = await service.login(session)
-    # TODO добавить ошибку неправильного логина/пароля
+    except exceptions.AuthUnauthorizedException:
+        return render_message(
+            request,
+            message="Некорректная комбинация логина и пароля.",
+            back_url="/login",
+            button_text="Вернуться на страницу входа",
+        )
     except Exception as e:
         return render_message(
             request,

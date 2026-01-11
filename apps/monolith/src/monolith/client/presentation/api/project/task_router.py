@@ -17,14 +17,13 @@ from monolith.client.application.interfaces.services.task_service import ITaskSe
 from monolith.client.application.interfaces.services.task_status_service import ITaskStatusService
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
 from monolith.client.presentation.api.dependencies import (
-    get_current_user,
     get_participant_with_profile_service,
     get_user_profile_service
 )
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_task_service, get_sprint_service, \
     get_task_status_service
-from monolith.client.presentation.api.utils import render_message, get_status_color
+from monolith.client.presentation.api.utils import render_message, get_status_color, get_current_user
 from monolith.client.presentation.schemas import user_profile as profile_schemas
 from monolith.client.presentation.schemas import views
 from monolith.client.presentation.schemas.task import CreateTaskSchema, UpdateTaskSchema

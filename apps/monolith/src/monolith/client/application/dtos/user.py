@@ -17,6 +17,10 @@ class LoginUserCommand(BaseModel):
     password: SecretStr
 
 
+class TokenResponse(BaseModel):
+    token: str
+
+
 class LoginUserResponse(BaseModel):
     access_token: str
     refresh_token: str
