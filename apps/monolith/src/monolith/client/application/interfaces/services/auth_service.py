@@ -8,12 +8,12 @@ class IAuthService(ABC):
     """Интерфейс сервиса авторизации"""
 
     @abstractmethod
-    async def register(self, data: user.CreateUserCommand) -> user.CreateUserResponse:
+    async def register(self, data: user.CreateUserCommand) -> user.CreateUserResponse | None:
         """Регистрация пользователя"""
         raise NotImplementedError
 
     @abstractmethod
-    async def login(self, data: user.LoginUserCommand) -> user.LoginUserResponse:
+    async def login(self, data: user.LoginUserCommand) -> user.LoginUserResponse | None:
         """Вход пользователя в систему"""
         raise NotImplementedError
 
