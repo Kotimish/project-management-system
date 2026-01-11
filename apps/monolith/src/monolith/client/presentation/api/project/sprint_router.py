@@ -284,6 +284,7 @@ async def update_sprint(
         request: Request,
         project_id: int,
         sprint_id: int,
+        page: str | None = None,
         sprint_service: ISprintService = Depends(get_sprint_service),
         current_user: dto.UserProfileDTO = Depends(get_current_user),
 ):
@@ -297,6 +298,10 @@ async def update_sprint(
         )
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     back_url = f"/projects/{project_id}/sprints/{sprint_id}/"
+    if page == "project":
+        back_url = f"/projects/{project_id}"
+    else:
+        back_url = f"/projects/{project_id}/sprints/{sprint_id}"
     try:
         await sprint_service.delete_sprint(project_id, sprint_id)
         return RedirectResponse(url=f"/projects/{project_id}", status_code=303)

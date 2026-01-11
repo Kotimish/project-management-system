@@ -282,7 +282,7 @@ async def update_task(
         project_id: int,
         sprint_id: int,
         task_id: int,
-        page: str = None,
+        page: str | None = None,
         task_service: ITaskService = Depends(get_task_service),
         current_user: profile_dto.UserProfileDTO = Depends(get_current_user),
 ):

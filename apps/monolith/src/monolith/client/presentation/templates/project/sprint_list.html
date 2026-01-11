@@ -42,19 +42,26 @@
                 </div>
             </td>
             <td>
-                <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}"
-                   class="btn btn-sm btn-outline-secondary me-2"
-                >
-                    Детали
-                </a>
-                <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}/edit"
-                   class="btn btn-sm btn-outline-secondary me-2"
-                >
-                    Редактировать
-                </a>
-                <a href="#" class="btn btn-sm btn-outline-danger">
-                    Удалить
-                </a>
+
+                <div class="d-flex align-items-center">
+                    <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Детали
+                    </a>
+                    <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}/edit"
+                       class="btn btn-sm btn-outline-secondary me-2"
+                    >
+                        Редактировать
+                    </a>
+                    <form action="/projects/{{project.id}}/sprints/{{sprint.id}}/delete?page=project"
+                          method="post"
+                    >
+                        <button type="submit" class="btn btn-sm btn-outline-danger me-2">
+                            Удалить
+                        </button>
+                    </form>
+                </div>
             </td>
         </tr>
         {% endfor %}
