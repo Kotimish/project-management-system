@@ -8,14 +8,19 @@ from starlette.responses import RedirectResponse
 
 from monolith.client.application.dtos import task as task_dto
 from monolith.client.application.dtos import user_profile as profile_dto
+from monolith.client.application.exceptions import api_client_exception as api_exceptions
 from monolith.client.application.exceptions import api_client_exception as exceptions
+from monolith.client.application.exceptions import task_exception as exceptions
 from monolith.client.application.interfaces.services.composite import IProjectTeamService
 from monolith.client.application.interfaces.services.sprint_service import ISprintService
 from monolith.client.application.interfaces.services.task_service import ITaskService
 from monolith.client.application.interfaces.services.task_status_service import ITaskStatusService
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
-from monolith.client.presentation.api.dependencies import get_current_user, get_participant_with_profile_service, \
+from monolith.client.presentation.api.dependencies import (
+    get_current_user,
+    get_participant_with_profile_service,
     get_user_profile_service
+)
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_task_service, get_sprint_service, \
     get_task_status_service
@@ -269,6 +274,61 @@ async def update_task(
         url=f"/projects/{project_id}/sprints/{sprint_id}/tasks/{task_id}",
         status_code=303
     )
+
+
+@router.post("/{task_id}/delete", response_class=HTMLResponse, include_in_schema=False)
+async def update_task(
+        request: Request,
+        project_id: int,
+        sprint_id: int,
+        task_id: int,
+        page: str = None,
+        task_service: ITaskService = Depends(get_task_service),
+        current_user: profile_dto.UserProfileDTO = Depends(get_current_user),
+):
+    """Удаление задачи"""
+    if current_user is None:
+        return render_message(
+            request,
+            message="Вы не авторизованы в системе.",
+            back_url="/login",
+            button_text="Перейти на страницу входа"
+        )
+    user_schema = profile_schemas.GetUserProfileResponse(**current_user.model_dump())
+    if page == "sprint":
+        back_url = f"/projects/{project_id}/sprints/{sprint_id}"
+    else:
+        back_url = f"/projects/{project_id}/sprints/{sprint_id}/tasks/{task_id}"
+    try:
+        await task_service.delete_task(project_id, sprint_id, task_id)
+        return RedirectResponse(url=f"/projects/{project_id}/sprints/{sprint_id}", status_code=303)
+    except exceptions.TaskNotFoundError:
+        return render_message(
+            request=request,
+            message="Задача не найден в проекте.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к задаче",
+            current_user=user_schema.model_dump()
+        )
+    except exceptions.TaskUnauthorizedError:
+        return render_message(
+            request=request,
+            message="Произошла ошибка при удалении задачи: переданы некорректные данные.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к задаче",
+            current_user=user_schema.model_dump()
+        )
+    except api_exceptions.HTTPStatusError as e:
+        return render_message(
+            request=request,
+            message="Произошла ошибка при удалении задачи.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к задаче",
+            current_user=user_schema.model_dump()
+        )
 
 
 @router.get("/{task_id}", response_class=HTMLResponse, include_in_schema=False)

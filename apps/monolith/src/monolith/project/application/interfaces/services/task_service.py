@@ -45,7 +45,7 @@ class ITaskService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_task(self, task_id: int) -> bool:
+    async def delete_task(self, project_id: int, sprint_id: int, task_id: int) -> None:
         """Удалить задачу по id"""
         raise NotImplementedError
 

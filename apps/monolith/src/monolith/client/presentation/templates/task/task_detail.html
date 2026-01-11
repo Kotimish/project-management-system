@@ -12,14 +12,20 @@
                 </div>
                 <div class="col-sm-2">
                     <!-- Кнопки действий с задачей спринта проекта -->
-                    <a href="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}/edit"
-                       class="btn btn-sm btn-outline-secondary me-2"
-                    >
-                        Редактировать
-                    </a>
-                    <a href="#" class="btn btn-sm btn-outline-danger">
-                        Удалить
-                    </a>
+                    <div class="d-flex align-items-center">
+                        <a href="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}/edit"
+                           class="btn btn-sm btn-outline-secondary me-2"
+                        >
+                            Редактировать
+                        </a>
+                        <form action="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}/delete"
+                              method="post"
+                        >
+                            <button type="submit" class="btn btn-sm btn-outline-danger me-2">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@ from monolith.project.application.dto import task as task_dto
 from monolith.project.application.interfaces.factories.task_factory import ITaskFactory
 from monolith.project.application.interfaces.services.task_service import ITaskService
 from monolith.project.application.interfaces.services.task_status_service import ITaskStatusService
-from monolith.project.domain.exceptions.task_exception import TaskNotFoundError, TaskUnauthorizedError
+from monolith.project.domain.exceptions import task_exception
 from monolith.project.domain.interfaces.repositories.task_repository import ITaskRepository
 
 
@@ -113,8 +113,19 @@ class TaskService(ITaskService):
             for task in tasks
         ]
 
-    async def delete_task(self, task_id: int) -> bool:
-        return await self.repository.remove(task_id)
+    async def delete_task(self, project_id: int, sprint_id: int, task_id: int) -> None:
+        task = await self.repository.get_by_id(task_id)
+        if task is None:
+            raise task_exception.TaskNotFoundError(f"Task with id \"{project_id}\" not found")
+        if task.sprint_id != sprint_id:
+            raise task_exception.TaskUnauthorizedError("Task does not belong to sprint")
+        if task.project_id != project_id:
+            raise task_exception.TaskUnauthorizedError("Task does not belong to project")
+        status = await self.repository.remove(task_id)
+        if not status:
+            raise task_exception.TaskNotFoundError(
+                "Task not found in the project"
+            )
 
     async def update_task(
             self,
@@ -125,11 +136,11 @@ class TaskService(ITaskService):
     ) -> dto.TaskDTO:
         task = await self.repository.get_by_id(task_id)
         if task is None:
-            raise TaskNotFoundError(f"Task with id \"{project_id}\" not found")
+            raise task_exception.TaskNotFoundError(f"Task with id \"{project_id}\" not found")
         if task.sprint_id != sprint_id:
-            raise TaskUnauthorizedError("Task does not belong to sprint")
+            raise task_exception.TaskUnauthorizedError("Task does not belong to sprint")
         if task.project_id != project_id:
-            raise TaskUnauthorizedError("Task does not belong to project")
+            raise task_exception.TaskUnauthorizedError("Task does not belong to project")
 
         if data.title is not None:
             task.title = data.title

@@ -31,3 +31,7 @@ class TaskNotFoundError(TaskException):
 
 class TaskUnauthorizedError(TaskException):
     """Исключение при попытке получения доступа к Задаче без соответствующих прав"""
+
+
+class TaskCannotBeDeletedException(TaskException):
+    """Исключение при невозможности удалить задачу из-за связанных сущностей"""

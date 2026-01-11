@@ -32,3 +32,8 @@ class ITaskService(ABC):
     ) -> dto.TaskDTO | None:
         """Обновить данные задачи"""
         raise NotImplementedError
+
+    @abstractmethod
+    async def delete_task(self, project_id: int, sprint_id: int, task_id: int) -> None:
+        """удалить задачу"""
+        raise NotImplementedError

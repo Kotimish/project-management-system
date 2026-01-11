@@ -1,6 +1,7 @@
 from monolith.client.application.dtos import task as dto
 from monolith.client.application.dtos import views as views
-from monolith.client.application.exceptions import api_client_exception as exceptions
+from monolith.client.application.exceptions import api_client_exception as api_exceptions
+from monolith.client.application.exceptions import task_exception as exceptions
 from monolith.client.application.interfaces.client import IApiClient
 from monolith.client.application.interfaces.services.task_service import ITaskService
 
@@ -18,7 +19,7 @@ class TaskService(ITaskService):
             )
             tasks = views.TaskListView.model_validate(raw_tasks)
             return tasks
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return None
 
     async def get_task_by_id(self, project_id: int, sprint_id: int, task_id: int) -> views.TaskView | None:
@@ -28,7 +29,7 @@ class TaskService(ITaskService):
             )
             task = views.TaskView.model_validate(raw_task)
             return task
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return None
 
     async def create_task(self, project_id: int, sprint_id: int, data: dto.CreateTaskCommand) -> dto.TaskDTO | None:
@@ -39,7 +40,7 @@ class TaskService(ITaskService):
             )
             task = dto.TaskDTO.model_validate(raw_task)
             return task
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return None
 
     async def update_task(
@@ -56,5 +57,20 @@ class TaskService(ITaskService):
             )
             task = dto.TaskDTO.model_validate(raw_task)
             return task
-        except exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError:
             return None
+
+    async def delete_task(self, project_id: int, sprint_id: int, task_id: int) -> None:
+        try:
+            await self.project_client.delete(
+                f"/api/projects/{project_id}/sprints/{sprint_id}/tasks/{task_id}",
+            )
+        except api_exceptions.HTTPStatusError as exception:
+            if exception.status_code == 404:
+                raise exceptions.TaskNotFoundError(
+                    "Task not found in the project"
+                )
+            if exception.status_code == 403:
+                raise exceptions.TaskUnauthorizedError(
+                    "Task does not belong to project or to sprint"
+                )
