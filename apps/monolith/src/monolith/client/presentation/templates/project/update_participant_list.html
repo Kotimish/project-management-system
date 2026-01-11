@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Изменение списка участников{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- Блок участников проекта -->
+            <div class="card mb-4">
+                <div class="card-header d-flex flex-column">
+                    <h4 class="text-primary font-size-20 mt-3 mb-2">Участники</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table user-list">
+                    <thead>
+                        <tr>
+                            <th ><span>Пользователь</span></th>
+                            <th ><span>Полное имя (при наличии)</span></th>
+                            <th ><span>Роль</span></th>
+                            <th><span>Контакты</span></th>
+                            <th><span>Действия</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participant in participants %}
+                        <tr>
+                            <td>
+                                <h4>{{ participant.display_name }}</h4>
+                            </td>
+                            <td>
+                                {% if participant.last_name %}
+                                {{ participant.last_name }}
+                                {% endif %}
+                                {% if participant.first_name %}
+                                {{ participant.first_name }}
+                                {% endif %}
+                                {% if participant.middle_name %}
+                                {{ participant.middle_name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if participant.auth_user_id == owner.auth_user_id %}
+                                Владелец проекта
+                                {% else %}
+                                Участник проекта
+                                {% endif %}
+                            </td>
+                            <td>
+                                <i class="bi bi-telephone me-2"></i>
+                                {% if participant.phone %}
+                                {{ participant.phone }}
+                                {% else %}
+                                — Не указан —
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/profiles/{{participant.auth_user_id}}"
+                                       class="btn btn-sm btn-outline-secondary me-2"
+                                    >
+                                        Детали
+                                    </a>
+                                    {% if participant.auth_user_id != owner.auth_user_id %}
+                                    <form action="/projects/{{project.id}}/participants/{{participant.auth_user_id}}/remove"
+                                          method="post"
+                                    >
+                                        <button type="submit" class="btn btn-sm btn-outline-danger me-2">
+                                            Исключить
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            <!-- Блок остальных пользователей проекта -->
+            <div class="card mb-4">
+                <div class="card-header d-flex flex-column">
+                    <h4 class="text-primary font-size-20 mt-3 mb-2">Пользователи</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table user-list">
+                    <thead>
+                        <tr>
+                            <th ><span>Пользователь</span></th>
+                            <th ><span>Полное имя (при наличии)</span></th>
+                            <th><span>Контакты</span></th>
+                            <th><span>Действия</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <h4>{{ user.display_name }}</h4>
+                            </td>
+                            <td>
+                                {% if user.last_name %}
+                                {{ user.last_name }}
+                                {% endif %}
+                                {% if user.first_name %}
+                                {{ user.first_name }}
+                                {% endif %}
+                                {% if user.middle_name %}
+                                {{ user.middle_name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <i class="bi bi-telephone me-2"></i>
+                                {% if user.phone %}
+                                {{ user.phone }}
+                                {% else %}
+                                — Не указан —
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/profiles/{{user.auth_user_id}}"
+                                       class="btn btn-sm btn-outline-secondary me-2"
+                                    >
+                                        Детали
+                                    </a>
+                                    <form action="/projects/{{project.id}}/participants/{{user.auth_user_id}}/add"
+                                          method="post"
+                                    >
+                                        <button type="submit" class="btn btn-sm btn-outline-success me-2">
+                                            Добавить
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

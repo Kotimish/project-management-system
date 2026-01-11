@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="col-sm-10">
+                    <h1>{{ project.name }}</h1>
+                </div>
+                <div class="col-sm-2">
+                    <!-- Кнопки действий с проектом -->
+                    <div class="d-flex align-items-center">
+                        <a href="/projects/{{ project.id }}/edit"
+                           class="btn btn-sm btn-outline-secondary me-2"
+                        >
+                            Редактировать
+                        </a>
+                        <form action="/projects/{{ project.id }}/delete"
+                              method="post"
+                        >
+                            <button type="submit" class="btn btn-sm btn-outline-danger me-2">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <!-- Владелец проекта -->
+                        <dt class="col-sm-4">Владелец:</dt>
+                        <dd class="col-sm-8">
+                            <a href="/profiles/{{ owner.auth_user_id }}"
+                            >
+                                {{ owner.display_name }}
+                            </a>
+                        </dd>
+
+                        <dt class="col-sm-4">Дата создания:</dt>
+                        <dd class="col-sm-8">{{ project.created_at.strftime('%d.%m.%Y %H:%M') }}</dd>
+
+                        <dt class="col-sm-4">Дата обновления:</dt>
+                        <dd class="col-sm-8">{{ project.updated_at.strftime('%d.%m.%Y %H:%M') }}</dd>
+                    </dl>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3">
+                    <h3>Описание:</h3>
+                </div>
+                {% if project.description %}
+                <p>{{ project.description }}</p>
+                {% else %}
+                <div class="alert alert-info">
+                    В этом проекте отсутствует описание.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <ul
+                    class="nav nav-tabs card-header-tabs border-bottom-0 justify-content-center"
+                    role="tablist"
+            >
+                <li class="nav-item" role="presentation">
+                    <button
+                            class="nav-link active"
+                            id="sprints-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#sprints"
+                            type="button"
+                            role="tab"
+                            aria-controls="sprints"
+                            aria-selected="true"
+                    >Спринты</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button
+                            class="nav-link"
+                            id="participants-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#participants"
+                            type="button"
+                            role="tab"
+                            aria-controls="participants"
+                            aria-selected="false"
+                    >Команда</button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content p-4">
+                <div class="tab-pane fade show active" id="sprints" role="tabpanel" aria-labelledby="sprints-tab">
+                    <!-- Блок спринтов проекта -->
+                    {% include 'project/sprint_list.html' %}
+                </div>
+                <div class="tab-pane fade show" id="participants" role="tabpanel" aria-labelledby="participants-tab">
+                    <!-- Блок участников проекта -->
+                    {% include 'project/participant_list.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

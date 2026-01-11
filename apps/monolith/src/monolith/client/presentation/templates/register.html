@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+<!--Блок стилей-->
+{% block style %}
+.form-signin {
+width: 100%;
+max-width: 330px;
+padding: 15px;
+margin: auto;
+}
+
+.form-signin .checkbox {
+font-weight: 400;
+}
+
+.form-signin .form-floating:focus-within {
+z-index: 2;
+}
+
+.form-signin input[type="email"] {
+margin-bottom: -1px;
+border-bottom-right-radius: 0;
+border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+margin-bottom: 10px;
+border-top-left-radius: 0;
+border-top-right-radius: 0;
+}
+{% endblock %}
+
+{% block content %}
+
+<div class="text-center form-signin">
+
+    <form action="/register" method="post">
+        <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
+
+        <div class="form-floating">
+            <input type="text" class="form-control" id="login" name="login" placeholder="Логин" required>
+            <label for="login">Логин</label>
+        </div>
+        <div class="form-floating">
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+            <label for="email">Email</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Пароль" required>
+            <label for="password">Пароль</label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Регистрация</button>
+
+    </form>
+</div>
+{% endblock %}
