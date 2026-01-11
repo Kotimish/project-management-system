@@ -16,7 +16,7 @@ class Sprint(IdIntPkMixin, TimestampMixin, Base):
 
     name: Mapped[str] = mapped_column(
         String(100),
-        unique=True,
+        unique=False,
         nullable=False
     )
     start_date: Mapped[date] = mapped_column(

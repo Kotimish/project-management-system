@@ -16,7 +16,7 @@ class Project(IdIntPkMixin, TimestampMixin, Base):
 
     name: Mapped[str] = mapped_column(
         String(100),
-        unique=True,
+        unique=False,
         nullable=False
     )
     description: Mapped[str | None] = mapped_column(

@@ -55,10 +55,6 @@ def upgrade() -> None:
             'id',
             name=op.f('pk_projects')
         ),
-        sa.UniqueConstraint(
-            'name',
-            name=op.f('uq_projects_name')
-        ),
         schema='project',
     )
 
