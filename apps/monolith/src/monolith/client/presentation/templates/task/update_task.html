@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Обновить задачу{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <h1>Редактирование задачи</h1>
+            <form method="post" action="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}/edit">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Название задачи</label>
+                    <input
+                            type="text"
+                            class="form-control {% if errors and errors.title %}is-invalid{% endif %}"
+                            id="title"
+                            name="title"
+                            value="{{ form_data.get('title') if form_data else task.title }}"
+                            maxlength="255"
+                            required
+                    >
+                    {% if errors and errors.get('title') %}
+                    <div class="invalid-feedback">{{ errors.title }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="statusSelect" class="form-label">Статус</label>
+                    <select class="form-control" id="statusSelect" name="status">
+                        {% for status in statuses %}
+                            <option value="{{ status.id }}" {% if status.id == task.status.id %}selected{% endif %}>
+                                {{ status.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="assigneeSelect" class="form-label">Ответственный</label>
+                    <select class="form-control" id="assigneeSelect" name="assignee">
+                        <option
+                                value=""
+                                {% if not task.assignee %}selected{% endif %}
+                        >
+                            — Не назначен —
+                        </option>
+                        {% for participant in participants %}
+                            <option
+                                    value="{{ participant.participant_id }}"
+                                    {% if task.assignee %}
+                                    {% if participant.auth_user_id == task.assignee.auth_user_id %}
+                                    selected
+                                    {% endif %}
+                                    {% endif %}
+                            >
+                                {{ participant.display_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Описание</label>
+                    <textarea
+                            class="form-control {% if errors and errors.get('description') %}is-invalid{% endif %}"
+                            id="description"
+                            name="description"
+                            rows="5"
+                            placeholder="Введите описание задачи..."
+                    >{{ form_data.get('description') if form_data else task.description }}</textarea>
+                    {%if errors.description%}
+                    <div class="invalid-feedback">{{ errors.description }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Сохранить задачу</button>
+                    <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}/tasks/{{ task.id }}"
+                       class="btn btn-secondary"
+                    >
+                        Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

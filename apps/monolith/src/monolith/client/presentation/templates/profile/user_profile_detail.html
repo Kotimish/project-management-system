@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Центральная колонка -->
+        <div class="col-xl-8">
+            <!-- Блок Шапка с личной информаций пользователя-->
+            <div class="card mb-4">
+                <div class="card-body pb-0">
+                    <div class="row align-items-center">
+                        <!-- Блок с аватаркой и именем -->
+                        <div class="col-md-3">
+                            <div class="text-center border-end">
+                                {% if profile.avatar_url %}
+                                <img src="{{ profile.avatar_url }}" alt="Avatar" class="rounded-circle img-fluid">
+                                {% else %}
+                                <!-- Заглушка: круг с иконкой -->
+                                <div class="fs-2 rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                {% endif %}
+                                <h4 class="text-primary font-size-20 mt-3 mb-2">{{ profile.display_name }}</h4>
+                            </div>
+                        </div>
+                        <!-- Конец блок с аватаркой -->
+                        <!-- Блок с биографией и контактными данными -->
+                        <div class="col-md-9">
+                            <div class="ms-3">
+                                <div>
+                                    <h4 class="card-title mb-2">Биография</h4>
+                                    <p class="mb-0 text-muted">{{ profile.description }}</p>
+                                </div>
+                                <div class="row my-4">
+                                    <div class="col-md-12">
+                                        <div>
+<!--                                            <p class="text-muted mb-2 fw-medium">-->
+<!--                                                <i class="bi bi-envelope me-2"></i>-->
+<!--                                                Janshwells@probic.com-->
+<!--                                            </p>-->
+                                            <p class="text-muted fw-medium mb-0">
+                                                <i class="bi bi-telephone me-2"></i>
+                                                {% if profile.phone %}
+                                                {{ profile.phone }}
+                                                {% else %}
+                                                — Не указан —
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Конец блока с биографией -->
+                    </div>
+                </div>
+            </div>
+            <!-- Конец блока шапки с личной информацией пользователя -->
+
+            <!-- Секция блоков с проектами и задачами -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <!-- Подблок со ссылками на проекты и задачи -->
+                    <ul
+                            class="nav nav-tabs card-header-tabs border-bottom-0 justify-content-center"
+                            role="tablist"
+                    >
+                        <li class="nav-item" role="presentation">
+                            <button
+                                    class="nav-link active"
+                                    id="projects-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#projects"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="projects"
+                                    aria-selected="true"
+                            >Проекты</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button
+                                    class="nav-link"
+                                    id="tasks-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#tasks"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="tasks"
+                                    aria-selected="false"
+                            >Задачи</button>
+                        </li>
+                    </ul>
+                    <!-- Конец подблока со ссылками -->
+                </div>
+                <div class="card-body">
+                    <div class="tab-content p-4">
+                        <div class="tab-pane fade show active" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                            <h4 class="card-title">Проекты</h4>
+                            {% include 'profile/project_list.html' %}
+                        </div>
+                        <div class="tab-pane fade show" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
+                            <h4 class="card-title">Задачи</h4>
+                            {% include 'profile/task_list.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- Конец центральной колонки -->
+        <!-- Боковая колонка -->
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-body">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h4 class="card-title mb-4">Личные данные</h4>
+                            {% if profile.auth_user_id == user.auth_user_id %}
+                            <a
+                                    href="/profiles/{{user.auth_user_id}}/edit"
+                                    class="btn btn-sm btn-outline-secondary me-2"
+                            >
+                                Редактировать
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered mb-0">
+                                <tbody>
+                                <tr>
+                                    <th scope="row">Фамилия</th>
+                                    {% if profile.last_name %}
+                                    <td>{{ profile.last_name }}</td>
+                                    {% else %}
+                                    <td>— Не указана —</td>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    <th scope="row">Имя</th>
+                                    {% if profile.first_name %}
+                                    <td>{{ profile.first_name }}</td>
+                                    {% else %}
+                                    <td>— Не указано —</td>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                <tr>
+                                    <th scope="row">Отчество</th>
+                                    {% if profile.middle_name %}
+                                    <td>{{ profile.middle_name }}</td>
+                                    {% else %}
+                                    <td>— Не указано —</td>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    <th scope="row">Дата рождения</th>
+                                    {% if profile.birthdate %}
+                                    <td>{{ profile.birthdate.strftime('%Y-%m-%d') }}</td>
+                                    {% else %}
+                                    <td>— Не указана —</td>
+                                    {% endif %}
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

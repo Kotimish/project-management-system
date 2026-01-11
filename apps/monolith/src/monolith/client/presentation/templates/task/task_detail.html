@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Задача — {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="col-sm-10">
+                    <h1>{{ task.title }}</h1>
+                </div>
+                <div class="col-sm-2">
+                    <!-- Кнопки действий с задачей спринта проекта -->
+                    <div class="d-flex align-items-center">
+                        <a href="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}/edit"
+                           class="btn btn-sm btn-outline-secondary me-2"
+                        >
+                            Редактировать
+                        </a>
+                        <form action="/projects/{{project.id}}/sprints/{{sprint.id}}/tasks/{{task.id}}/delete"
+                              method="post"
+                        >
+                            <button type="submit" class="btn btn-sm btn-outline-danger me-2">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <!-- Общая информация о задачи -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <h5>Основная информация</h5>
+            <dl class="row">
+                <dt class="col-sm-4">Проект:</dt>
+                <dd class="col-sm-8">
+                    <a href="/projects/{{ project.id }}">{{ project.name }}</a>
+                </dd>
+
+                <dt class="col-sm-4">Спринт:</dt>
+                <dd class="col-sm-8">
+                    <a href="/projects/{{ project.id }}/sprints/{{ sprint.id }}">{{ sprint.name }}</a>
+                </dd>
+
+                <dt class="col-sm-4">Статус:</dt>
+                <dd class="col-sm-8">
+                    <span class="badge {{ task.color }}">{{ task.status.name }}</span>
+                </dd>
+
+                <dt class="col-sm-4">Ответственный:</dt>
+                <dd class="col-sm-8">
+                    {% if profile %}
+                    <a href="/profiles/{{ profile.auth_user_id }}">{{ profile.display_name }}</a>
+                    {% else %}
+                    <span class="text-muted">— Не назначен —</span>
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div>
+        <div class="mb-3">
+            <h3>Описание:</h3>
+        </div>
+        {% if task.description %}
+        <p>{{ task.description }}</p>
+        {% else %}
+        <div class="alert alert-info">
+            В этой задаче отсутствует описание.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
