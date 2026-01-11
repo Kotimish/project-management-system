@@ -46,21 +46,38 @@ class ProjectService(IProjectService):
         except api_exceptions.HTTPStatusError:
             return None
 
-    async def update_project(self, project_id: int, data: dto.UpdateProjectDTO) -> dto.ProjectDTO | None:
+    async def update_project(
+            self,
+            project_id: int,
+            data: dto.UpdateProjectDTO,
+            access_token: str
+    ) -> dto.ProjectDTO | None:
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
         try:
             raw_project = await self.project_client.patch(
                 f"/api/projects/{project_id}",
+                headers=headers,
                 json=data.model_dump(mode='json')
             )
             project = dto.ProjectDTO.model_validate(raw_project)
             return project
-        except api_exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError as exception:
+            if exception.status_code == 403:
+                raise exceptions.ProjectForbiddenError(
+                    "User do not have permission to modify this resource"
+                )
             return None
 
-    async def delete_project(self, project_id: int) -> None:
+    async def delete_project(self, project_id: int, access_token: str) -> None:
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
         try:
             await self.project_client.delete(
                 f"/api/projects/{project_id}",
+                headers=headers,
             )
         except api_exceptions.HTTPStatusError as exception:
             if exception.status_code == 409:
@@ -70,4 +87,8 @@ class ProjectService(IProjectService):
             if exception.status_code == 404:
                 raise exceptions.ProjectNotFoundError(
                     "Project not found"
+                )
+            if exception.status_code == 403:
+                raise exceptions.ProjectForbiddenError(
+                    "User do not have permission to modify this resource"
                 )

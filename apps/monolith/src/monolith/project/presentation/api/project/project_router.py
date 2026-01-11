@@ -1,11 +1,15 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 
 from monolith.client.presentation.schemas import views as views
 from monolith.project.application.dto.project import UpdateProjectCommand
 from monolith.project.application.interfaces.services.project_service import IProjectService
+from monolith.project.application.interfaces.services.token_service import ITokenService
 from monolith.project.application.interfaces.services.view_service import IViewService
 from monolith.project.domain.exceptions import project_exception as exceptions
-from monolith.project.presentation.api.dependencies import get_view_service
+from monolith.project.presentation.api.dependencies import get_view_service, get_token_service
 from monolith.project.presentation.api.project.dependencies import get_project_service
 from monolith.project.presentation.schemas.project import ProjectSchema, CreateProjectSchema, UpdateProjectSchema
 
@@ -13,6 +17,8 @@ router = APIRouter(
     prefix="/projects",
     tags=["projects"]
 )
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 @router.get("/search")
@@ -56,27 +62,43 @@ async def get_project(
 async def update_project(
         project_id: int,
         data: UpdateProjectSchema,
-        service: IProjectService = Depends(get_project_service)
+        access_token: Annotated[str, Depends(oauth2_scheme)],
+        project_service: IProjectService = Depends(get_project_service),
+        token_service: ITokenService = Depends(get_token_service),
 ) -> ProjectSchema:
+    token = await token_service.validate_token(access_token)
+    if token is None:
+        raise HTTPException(status_code=403, detail="Invalid token")
     command = UpdateProjectCommand(
         name=data.name,
         description=data.description
     )
-    project = await service.update_project(
-        project_id,
-        command
-    )
-    return ProjectSchema(**project.model_dump())
+    try:
+        project = await project_service.update_project(
+            project_id,
+            token.sub,
+            command
+        )
+        return ProjectSchema(**project.model_dump())
+    except exceptions.ProjectForbiddenError as e:
+        raise HTTPException(status_code=403, detail=str(e))
 
 
 @router.delete("/{project_id}")
 async def delete_project(
         project_id: int,
-        project_service: IProjectService = Depends(get_project_service)
+        access_token: Annotated[str, Depends(oauth2_scheme)],
+        project_service: IProjectService = Depends(get_project_service),
+        token_service: ITokenService = Depends(get_token_service),
 ):
+    token = await token_service.validate_token(access_token)
+    if token is None:
+        raise HTTPException(status_code=403, detail="Invalid token")
     try:
-        await project_service.delete_project(project_id)
+        await project_service.delete_project(project_id, token.sub)
     except exceptions.ProjectCannotBeDeletedException as e:
         raise HTTPException(status_code=409, detail=str(e))
     except exceptions.ProjectNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except exceptions.ProjectForbiddenError as e:
+        raise HTTPException(status_code=403, detail=str(e))

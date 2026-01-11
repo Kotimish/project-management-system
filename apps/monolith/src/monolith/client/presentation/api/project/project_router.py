@@ -204,6 +204,8 @@ async def update_project(
             button_text="Перейти на страницу входа"
         )
 
+    access_token = request.cookies.get("access_token")
+    schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     create_project_dto = UpdateProjectDTO(
         name=name,
         description=description
@@ -211,7 +213,17 @@ async def update_project(
     try:
         project = await project_service.update_project(
             project_id,
-            create_project_dto
+            create_project_dto,
+            access_token
+        )
+    except exceptions.ProjectForbiddenError:
+        return render_message(
+            request=request,
+            message="Только владелец проекта может редактировать проект.",
+            title="Ошибка",
+            back_url=f"/projects/{project_id}/edit",
+            button_text="Назад к проекту",
+            current_user=schema.model_dump()
         )
     except Exception as e:
         return render_message(
@@ -248,10 +260,11 @@ async def delete_project(
             back_url="/login",
             button_text="Перейти на страницу входа"
         )
+    access_token = request.cookies.get("access_token")
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     back_url = f"/projects/{project_id}"
     try:
-        await project_service.delete_project(project_id)
+        await project_service.delete_project(project_id, access_token)
         return RedirectResponse(url="/projects", status_code=303)
     except exceptions.ProjectCannotBeDeletedException:
         return render_message(
@@ -266,6 +279,15 @@ async def delete_project(
         return render_message(
             request=request,
             message="Проект не найден в системе.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к проекту",
+            current_user=schema.model_dump()
+        )
+    except exceptions.ProjectForbiddenError:
+        return render_message(
+            request=request,
+            message="Только владелец проекта может редактировать проект.",
             title="Ошибка",
             back_url=back_url,
             button_text="Назад к проекту",

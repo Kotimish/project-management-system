@@ -5,7 +5,7 @@ from monolith.project.application.dto.sprint import UpdateSprintCommand
 from monolith.project.application.interfaces.factories.sprint_factory import ISprintFactory
 from monolith.project.application.interfaces.services.sprint_service import ISprintService
 from monolith.project.application.interfaces.services.task_service import ITaskService
-from monolith.project.domain.exceptions.sprint_exception import SprintUnauthorizedError
+from monolith.project.domain.exceptions.sprint_exception import SprintForbiddenError
 from monolith.project.domain.interfaces.repositories.sprint_repository import ISprintRepository
 from monolith.project.domain.exceptions import sprint_exception
 
@@ -60,7 +60,7 @@ class SprintService(ISprintService):
     async def update_sprint(self, project_id: int, sprint_id: int, data: UpdateSprintCommand) -> dto.SprintDTO:
         sprint = await self.repository.get_by_id(sprint_id)
         if sprint.project_id != project_id:
-            raise SprintUnauthorizedError("Sprint does not belong to project")
+            raise SprintForbiddenError("Sprint does not belong to project")
         if data.name is not None:
             sprint.name = data.name
         if data.start_date is not None:

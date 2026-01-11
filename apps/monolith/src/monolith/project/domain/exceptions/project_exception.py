@@ -17,5 +17,9 @@ class ProjectNotFoundError(ProjectException):
     """Исключение для несуществующего Проекта"""
 
 
+class ProjectForbiddenError(ProjectException):
+    """Исключение при попытке получения доступа к проекту без соответствующих прав"""
+
+
 class ProjectCannotBeDeletedException(ProjectException):
     """Исключение при невозможности удалить проект из-за связанных сущностей"""

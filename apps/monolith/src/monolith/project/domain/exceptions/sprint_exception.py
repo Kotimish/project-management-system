@@ -21,7 +21,7 @@ class SprintNotFoundError(SprintException):
     """Исключение для несуществующего Спринта"""
 
 
-class SprintUnauthorizedError(SprintException):
+class SprintForbiddenError(SprintException):
     """Исключение при попытке получения доступа к Спринту без соответствующих прав"""
 
 

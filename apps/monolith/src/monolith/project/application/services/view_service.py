@@ -3,7 +3,7 @@ from monolith.project.application.interfaces.services.view_service import IViewS
 from monolith.project.domain.exceptions.participant_exception import ParticipantNotFoundError
 # Исключения
 from monolith.project.domain.exceptions.project_exception import ProjectNotFoundError
-from monolith.project.domain.exceptions.sprint_exception import SprintNotFoundError, SprintUnauthorizedError
+from monolith.project.domain.exceptions.sprint_exception import SprintNotFoundError, SprintForbiddenError
 from monolith.project.domain.exceptions.task_exception import TaskNotFoundError, TaskUnauthorizedError
 from monolith.project.domain.exceptions.task_status_exception import TaskStatusNotFoundError
 # Репозитории
@@ -111,7 +111,7 @@ class ViewService(IViewService):
         if sprint is None:
             raise SprintNotFoundError(f"Sprint with id \"{sprint_id}\" not found")
         if sprint.project_id != project_id:
-            raise SprintUnauthorizedError("Sprint does not belong to project")
+            raise SprintForbiddenError("Sprint does not belong to project")
         dto_tasks = await self._get_dto_tasks_with_status_by_sprint_id(sprint.id)
         total_tasks = len(dto_tasks)
         completed_tasks = sum(task.status.slug == COMPLETED_STATUS_SLUG for task in dto_tasks)
@@ -138,7 +138,7 @@ class ViewService(IViewService):
         if sprint is None:
             raise SprintNotFoundError(f"Sprint with id \"{sprint_id}\" not found")
         if sprint.project_id != project_id:
-            raise SprintUnauthorizedError("Sprint does not belong to project")
+            raise SprintForbiddenError("Sprint does not belong to project")
         task = await self.task_repository.get_by_id(task_id)
         if task is None:
             raise TaskNotFoundError(f"Task with id \"{project_id}\" not found")

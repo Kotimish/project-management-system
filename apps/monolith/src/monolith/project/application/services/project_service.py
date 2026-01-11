@@ -70,9 +70,11 @@ class ProjectService(IProjectService):
             for project in projects
         ]
 
-    async def update_project(self, project_id: int, data: UpdateProjectCommand) -> project_dto.ProjectDTO:
-        # TODO требуется проверка на владельца проекта
+    async def update_project(self, project_id: int, owner_id: int, data: UpdateProjectCommand) -> project_dto.ProjectDTO:
         project = await self.repository.get_by_id(project_id)
+        if project.owner_id != owner_id:
+            raise project_exception.ProjectForbiddenError("User do not have permission to modify this resource")
+
         if data.name is not None:
             project.name = data.name
         if data.description is not None:
@@ -88,8 +90,10 @@ class ProjectService(IProjectService):
             updated_at=project.updated_at,
         )
 
-    async def delete_project(self, project_id: int) -> None:
-        # TODO требуется проверка на владельца проекта
+    async def delete_project(self, project_id: int, owner_id: int) -> None:
+        project = await self.repository.get_by_id(project_id)
+        if project.owner_id != owner_id:
+            raise project_exception.ProjectForbiddenError("User do not have permission to modify this resource")
         sprints = await self.sprint_service.get_all_sprint_by_project_id(project_id)
         if len(sprints) > 0:
             raise project_exception.ProjectCannotBeDeletedException(
@@ -97,19 +101,23 @@ class ProjectService(IProjectService):
             )
         participants = await self.participant_service.get_participants_by_project(project_id)
         for participant in participants:
-            await self.remove_participant_from_project(project_id, participant.auth_user_id)
+            await self.remove_participant_from_project(project_id, owner_id, participant.auth_user_id)
         status = await self.repository.remove(project_id)
         if not status:
             raise project_exception.ProjectNotFoundError(
                 "Project not found"
             )
 
-    async def add_participant_to_project(self, project_id: int, user_id: int) -> participant_dto.ParticipantDTO:
-        # TODO требуется проверка на владельца проекта
+    async def add_participant_to_project(self, project_id: int, owner_id: int, user_id: int) -> participant_dto.ParticipantDTO:
+        project = await self.repository.get_by_id(project_id)
+        if project.owner_id != owner_id:
+            raise project_exception.ProjectForbiddenError("User do not have permission to modify this resource")
         return await self.participant_service.add_participant(project_id, user_id)
 
-    async def remove_participant_from_project(self, project_id: int, user_id: int) -> None:
-        # TODO требуется проверка на владельца проекта
+    async def remove_participant_from_project(self, project_id: int, owner_id: int, user_id: int) -> None:
+        project = await self.repository.get_by_id(project_id)
+        if project.owner_id != owner_id:
+            raise project_exception.ProjectForbiddenError("User do not have permission to modify this resource")
         tasks = await self.task_service.get_tasks_by_auth_user_in_project(project_id, user_id)
         if len(tasks) > 0:
             raise participant_exception.ParticipantCannotBeDeletedException(

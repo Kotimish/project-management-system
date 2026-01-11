@@ -23,11 +23,16 @@ class IProjectService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_project(self, project_id: int, data: dto.UpdateProjectDTO) -> dto.ProjectDTO | None:
+    async def update_project(
+            self,
+            project_id: int,
+            data: dto.UpdateProjectDTO,
+            access_token: str
+    ) -> dto.ProjectDTO | None:
         """Обновить данные проекта"""
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_project(self, project_id: int) -> None:
+    async def delete_project(self, project_id: int, access_token: str) -> None:
         """Удалить проект"""
         raise NotImplementedError

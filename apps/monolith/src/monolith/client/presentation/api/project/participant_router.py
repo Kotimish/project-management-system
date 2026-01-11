@@ -115,8 +115,20 @@ async def add_participant_to_project(
             back_url="/login",
             button_text="Перейти на страницу входа"
         )
-    await participant_service.add_participant_to_project(project_id, user_id)
-    return RedirectResponse(url=f"/projects/{project_id}/participants/edit", status_code=303)
+    access_token = request.cookies.get("access_token")
+    schema = schemas.GetUserProfileResponse(**current_user.model_dump())
+    try:
+        await participant_service.add_participant_to_project(project_id, user_id, access_token)
+        return RedirectResponse(url=f"/projects/{project_id}/participants/edit", status_code=303)
+    except exceptions.ParticipantForbiddenException:
+        return render_message(
+            request=request,
+            message="Только владелец проекта может редактировать список участников проекта.",
+            title="Ошибка",
+            back_url=f"/projects/{project_id}/participants/edit",
+            button_text="Назад к странице редактирования участников",
+            current_user=schema.model_dump()
+        )
 
 
 @router.post("/{project_id}/participants/{user_id}/remove", response_class=HTMLResponse, include_in_schema=False)
@@ -134,10 +146,11 @@ async def remove_participant_from_project(
             back_url="/login",
             button_text="Перейти на страницу входа"
         )
+    access_token = request.cookies.get("access_token")
     schema = schemas.GetUserProfileResponse(**current_user.model_dump())
     back_url = f"/projects/{project_id}/participants/edit"
     try:
-        await participant_service.remove_participant_from_project(project_id, user_id)
+        await participant_service.remove_participant_from_project(project_id, user_id, access_token)
         return RedirectResponse(url=back_url, status_code=303)
     except exceptions.ParticipantCannotBeDeletedException:
         return render_message(
@@ -152,6 +165,15 @@ async def remove_participant_from_project(
         return render_message(
             request=request,
             message="Участник не найден в команде проекта.",
+            title="Ошибка",
+            back_url=back_url,
+            button_text="Назад к участникам",
+            current_user=schema.model_dump()
+        )
+    except exceptions.ParticipantForbiddenException:
+        return render_message(
+            request=request,
+            message="Только владелец проекта может редактировать список участников проекта.",
             title="Ошибка",
             back_url=back_url,
             button_text="Назад к участникам",

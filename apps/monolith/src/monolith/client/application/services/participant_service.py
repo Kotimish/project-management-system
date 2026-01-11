@@ -25,19 +25,36 @@ class ParticipantService(IParticipantService):
             return []
 
 
-    async def add_participant_to_project(self, project_id: int, user_id: int) -> dto.ParticipantDTO | None:
+    async def add_participant_to_project(
+            self,
+            project_id: int,
+            user_id: int,
+            access_token: str
+    ) -> dto.ParticipantDTO | None:
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
         try:
             raw_participant = await self.project_client.post(
                 f"/api/projects/{project_id}/participants/{user_id}",
+                headers=headers,
             )
             return dto.ParticipantDTO.model_validate(raw_participant)
-        except api_exceptions.HTTPStatusError:
+        except api_exceptions.HTTPStatusError as exception:
+            if exception.status_code == 403:
+                raise exceptions.ParticipantForbiddenException(
+                    "User do not have permission to modify this resource"
+                )
             return None
 
-    async def remove_participant_from_project(self, project_id: int, user_id: int) -> None:
+    async def remove_participant_from_project(self, project_id: int, user_id: int, access_token: str) -> None:
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
         try:
             await self.project_client.delete(
                 f"/api/projects/{project_id}/participants/{user_id}",
+                headers=headers,
             )
         except api_exceptions.HTTPStatusError as exception:
             if exception.status_code == 409:
@@ -47,4 +64,8 @@ class ParticipantService(IParticipantService):
             if exception.status_code == 404:
                 raise exceptions.ParticipantNotFoundError(
                     "Participant not found in the project"
+                )
+            if exception.status_code == 403:
+                raise exceptions.ParticipantForbiddenException(
+                    "User do not have permission to modify this resource"
                 )

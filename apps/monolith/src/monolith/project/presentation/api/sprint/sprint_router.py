@@ -62,7 +62,6 @@ async def update_sprint(
         data: UpdateSprintRequest,
         service: ISprintService = Depends(get_sprint_service)
 ) -> SprintResponse:
-    # TODO сделать проверку project_id
     command = UpdateSprintCommand(
         name=data.name,
         start_date=data.start_date,
