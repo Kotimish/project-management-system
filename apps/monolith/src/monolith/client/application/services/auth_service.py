@@ -57,7 +57,24 @@ class AuthService(IAuthService):
         except api_exceptions.HTTPStatusError as exception:
             if exception.status_code in {401, 403}:
                 raise exceptions.AuthUnauthorizedException(
-                    ""
+                    "User do not have permission"
+                )
+
+    async def refresh(self, refresh_token: str) -> dto.TokenResponse | None:
+        headers = {
+            "Authorization": f"Bearer {refresh_token}"
+        }
+        try:
+            response = await self.auth_client.post(
+                endpoint="/api/auth/refresh",
+                headers=headers
+            )
+            token = dto.TokenResponse.model_validate(response)
+            return token
+        except api_exceptions.HTTPStatusError as exception:
+            if exception.status_code in {401, 403}:
+                raise exceptions.AuthUnauthorizedException(
+                    "User do not have permission"
                 )
 
     async def logout(self, refresh_token: str) -> bool:

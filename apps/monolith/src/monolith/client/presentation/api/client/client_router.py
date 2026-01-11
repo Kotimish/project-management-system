@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from monolith.client.presentation.api.client import breadcrumbs as client_breadcrumbs
-from monolith.client.presentation.api.dependencies import get_current_user
+from monolith.client.presentation.api.utils import get_current_user
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.config.settings import BASE_DIR

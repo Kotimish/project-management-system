@@ -10,8 +10,8 @@ from pydantic import SecretStr
 from monolith.client.application.dtos.user import CreateUserCommand, LoginUserCommand
 from monolith.client.application.interfaces.services.client_service import IClientService
 from monolith.client.presentation.api.auth import breadcrumbs as auth_breadcrumbs
-from monolith.client.presentation.api.dependencies import get_client_service, get_current_user
-from monolith.client.presentation.api.utils import render_message
+from monolith.client.presentation.api.dependencies import get_client_service
+from monolith.client.presentation.api.utils import render_message, get_current_user
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.presentation.schemas.breadcrumb import Breadcrumb

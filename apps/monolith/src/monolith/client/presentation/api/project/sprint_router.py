@@ -13,10 +13,9 @@ from monolith.client.application.exceptions import api_client_exception as api_e
 from monolith.client.application.exceptions import sprint_exception as exceptions
 from monolith.client.application.interfaces.services.project_service import IProjectService
 from monolith.client.application.interfaces.services.sprint_service import ISprintService
-from monolith.client.presentation.api.dependencies import get_current_user
 from monolith.client.presentation.api.project import breadcrumbs as project_breadcrumbs
 from monolith.client.presentation.api.project.dependencies import get_sprint_service, get_project_service
-from monolith.client.presentation.api.utils import render_message, get_status_color
+from monolith.client.presentation.api.utils import render_message, get_status_color, get_current_user
 from monolith.client.presentation.schemas import user_profile as schemas
 from monolith.client.presentation.schemas import views
 from monolith.config.settings import BASE_DIR

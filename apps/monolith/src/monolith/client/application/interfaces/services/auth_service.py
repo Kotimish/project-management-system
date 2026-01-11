@@ -23,6 +23,11 @@ class IAuthService(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def refresh(self, refresh_token: str) -> user.TokenResponse | None:
+        """Обновление токена"""
+        raise NotImplementedError
+
+    @abstractmethod
     async def validate_token(self, access_token: str) -> TokenDTO | None:
         """
         Отправляет запрос на сервис авторизации для декодирования и проверки актуальности
