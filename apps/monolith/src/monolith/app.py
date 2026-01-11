@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from monolith.lifespan import lifespan
 from monolith.auth.presentation.api import router as auth_router
 from monolith.client.presentation.api import router as client_router
+from monolith.project.presentation.api import router as project_router
 from monolith.user_profile.presentation.api import router as user_profile_router
 
 app = FastAPI(lifespan=lifespan)
@@ -10,6 +11,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(client_router)
 app.include_router(user_profile_router)
+app.include_router(project_router)
 
 
 @app.get("/health/")

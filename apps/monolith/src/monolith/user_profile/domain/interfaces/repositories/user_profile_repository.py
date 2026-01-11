@@ -28,6 +28,13 @@ class IUserProfileRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_by_auth_user_ids(self, auth_user_ids: list[int]) -> list[UserProfile]:
+        """
+        Находит профили пользователей по их id из сервиса авторизации.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_all(self) -> list[UserProfile]:
         """
         Получает список всех профилей пользователей.

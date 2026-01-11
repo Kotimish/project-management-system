@@ -15,12 +15,22 @@ class IUserProfileService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_profile_by_id(self, profile_id: int) -> dto.GetUserProfileResponse | None:
+    async def get_all_profiles(self) -> list[dto.UserProfileDTO]:
         """Получение профиля пользователя по id"""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_profile_by_auth_user_id(self, auth_user_id: int) -> dto.GetUserProfileResponse | None:
+    async def get_profile_by_id(self, profile_id: int) -> dto.UserProfileDTO | None:
+        """Получение профиля пользователя по id"""
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_profiles_by_auth_user_ids(self, profile_ids: list[int]) -> list[dto.UserProfileDTO]:
+        """Получение профилей пользователей по списку из внешних id пользователя из сервиса авторизации"""
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_profile_by_auth_user_id(self, auth_user_id: int) -> dto.UserProfileDTO | None:
         """Получение профиля пользователя по внешнему id пользователя из сервиса авторизации"""
         raise NotImplementedError
 

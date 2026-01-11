@@ -3,6 +3,7 @@ from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from monolith.client.presentation.api.client import breadcrumbs as client_breadcrumbs
 from monolith.client.presentation.api.dependencies import get_current_user
 from monolith.client.application.dtos import user_profile as dto
 from monolith.client.presentation.schemas import user_profile as schemas
@@ -20,19 +21,21 @@ templates = Jinja2Templates(
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def index(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Главная страница сайта"""
     user = None
     if current_user is not None:
         schema = schemas.GetUserProfileResponse(**current_user.model_dump())
         user = schema.model_dump()
+    breadcrumbs = client_breadcrumbs.get_home_breadcrumb()
     context = {
         "request": request,
-        "user": user
+        "user": user,
+        "breadcrumbs": breadcrumbs
     }
     return templates.TemplateResponse(
-        "index.html",
+        "index/index.html",
         context
     )
 
@@ -40,7 +43,7 @@ async def index(
 @router.get("/about", response_class=HTMLResponse, include_in_schema=False)
 async def about(
         request: Request,
-        current_user: dto.GetUserProfileResponse = Depends(get_current_user)
+        current_user: dto.UserProfileDTO = Depends(get_current_user)
 ):
     """Страница о программе"""
     user = None

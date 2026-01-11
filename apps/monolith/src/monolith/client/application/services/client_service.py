@@ -1,6 +1,6 @@
 from monolith.client.application.dtos import user as user_models
 from monolith.client.application.dtos import user_profile as profile_models
-from monolith.client.application.dtos.user_profile import GetUserProfileResponse
+from monolith.client.application.dtos.user_profile import UserProfileDTO
 from monolith.client.application.interfaces.services.auth_service import IAuthService
 from monolith.client.application.interfaces.services.client_service import IClientService
 from monolith.client.application.interfaces.services.user_profile_service import IUserProfileService
@@ -28,7 +28,7 @@ class ClientService(IClientService):
     async def logout(self, refresh_token: str) -> bool:
         return await self.auth_service.logout(refresh_token)
 
-    async def get_current_user(self, access_token: str) -> GetUserProfileResponse | None:
+    async def get_current_user(self, access_token: str) -> UserProfileDTO | None:
         token = await self.auth_service.validate_token(access_token)
         if token is None:
             return None
